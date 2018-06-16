@@ -1,11 +1,9 @@
-import numpy as np
 import datetime as dt
 import matplotlib.pyplot as plt
 from matplotlib import style
 import sqlite3 as db
 import argparse
 from dateutil.relativedelta import relativedelta
-#import time
 import sys
 
 def get_start_date(period):
@@ -73,7 +71,6 @@ prices=list(zip(*all_rows))[1]
 
 style.use('ggplot')
 
-x_pos = np.arange(len(prices))
 plt.plot(dates, prices)
 plt.title(etf_name)
 plt.ylabel('Prices (' + etf_currency + ')')
