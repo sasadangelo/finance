@@ -30,7 +30,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("ticker", help="Specify the ETF ticker")
 parser.add_argument("-p", "--period", type=str, choices=['Max', '5Y', '1Y', 'YTD', '6M', '3M', '1M', '5D'], help="Specify the period of time")
 parser.add_argument("-v", "--volume", action='store_true', help="Specify the volume")
-parser.add_argument("-m", "--movingavg", type=int, choices=[5, 10, 20, 100, 200], help="Specify the moving average")
+parser.add_argument("-m", "--movingavg", type=int, choices=[5, 10, 20, 50, 100, 200], help="Specify the moving average")
 args=parser.parse_args()
 
 etf_name=args.ticker
@@ -79,22 +79,22 @@ movingavg = df['Close'].rolling(window=200,min_periods=0).mean()
 style.use('ggplot')
 
 if args.volume==False:
-   plt.plot(dates, prices)
+   plt.plot(dates, prices, label='Prices (' + etf_currency + ')')
    plt.title(etf_name)
-   plt.ylabel('Prices (' + etf_currency + ')')
 
    if args.movingavg!=None:
        movingavg = df['Close'].rolling(window=args.movingavg,min_periods=args.movingavg).mean()
-       plt.plot(dates, movingavg)
+       plt.plot(dates, movingavg, label='Moving average ' + str(args.movingavg) + ' days')
+   plt.legend()
 else:
    ax1 = plt.subplot2grid((6,1), (0,0), rowspan=5, colspan=1)
-   ax1.plot(dates, prices)
+   ax1.plot(dates, prices, label='Prices (' + etf_currency + ')')
    ax2 = plt.subplot2grid((6,1), (5,0), rowspan=1, colspan=1)
    ax2.bar(dates, volumes)
    ax1.set_title(etf_name)
-   ax1.set_ylabel('Prices (' + etf_currency + ')')
 
    if args.movingavg!=None:
        movingavg = df['Close'].rolling(window=args.movingavg,min_periods=args.movingavg).mean()
-       ax1.plot(dates, movingavg)
+       ax1.plot(dates, movingavg, label='Moving average ' + str(args.movingavg) + ' days')
+   ax1.legend()
 plt.show()
