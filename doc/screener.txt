@@ -1,0 +1,17 @@
+ETF eligible for my portfolio:
+------------------------------
+IWRD.MI
+XMWO.MI
+SWDA.MI
+CW8.MI
+WLD.MI
+
+Here the list of quotes I decided to filter out from my portfolio and the reason.
+---------------------------------------------------------------------------------
+XDWD.MI: Launched in April 2014
+MWRD.MI: Launched in November 2016
+
+Here the list of ETF on which I have doubts:
+--------------------------------------------
+SMSWLD.MI: documentation reports that is was launched in 2009 April 2nd but quotes start from November 2014
+HMWD.MI: documentation reports that is was launched in 2010 December 10th but quotes start from July 2017 
