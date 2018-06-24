@@ -7,13 +7,15 @@ import pandas as pd
 
 parser = argparse.ArgumentParser()
 parser.add_argument("ticker", help="Specify the ETF ticker")
-parser.add_argument("startdate", type=lambda d: dt.datetime.strptime(d, '%Y-%m-%d'), help="Specify start date for backtest period (YYYY-mm-dd)")
+parser.add_argument("-s", "--startdate", type=lambda d: dt.datetime.strptime(d, '%Y-%m-%d'), help="Specify start date for backtest period (YYYY-mm-dd)")
+parser.add_argument("-e", "--enddate", type=lambda d: dt.datetime.strptime(d, '%Y-%m-%d'), help="Specify end date for backtest period (YYYY-mm-dd)")
 args=parser.parse_args()
+
 
 try:
     cnx = db.connect('database/etfs.db')
     cur = cnx.cursor()
-    cur.execute('SELECT Date, Close FROM quotes WHERE Ticker="' + args.ticker + '" and Date > ?', [args.startdate])
+    cur.execute('SELECT Date, Close FROM quotes WHERE Ticker="' + args.ticker + '" and Date >= ?', [args.startdate])
     all_rows = cur.fetchall()
 except Exception as e:
     print('Failed to load quotes from database:')
