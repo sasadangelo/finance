@@ -11,8 +11,8 @@ parser.add_argument("-s", "--startdate", type=lambda d: dt.datetime.strptime(d, 
 parser.add_argument("-e", "--enddate", type=lambda d: dt.datetime.strptime(d, '%Y-%m-%d'), help="Specify end date for backtest period (YYYY-mm-dd)")
 args=parser.parse_args()
 
-#if args.startdate == None:
-#    args.startdate=dt.datetime(1970, 1, 1)
+if args.startdate == None:
+    args.startdate=dt.datetime(1970, 1, 1)
 
 try:
     cnx = db.connect('database/etfs.db')
