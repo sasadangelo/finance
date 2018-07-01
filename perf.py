@@ -11,6 +11,8 @@ parser.add_argument("-s", "--startdate", type=lambda d: dt.datetime.strptime(d, 
 parser.add_argument("-e", "--enddate", type=lambda d: dt.datetime.strptime(d, '%Y-%m-%d'), help="Specify end date for backtest period (YYYY-mm-dd)")
 args=parser.parse_args()
 
+#if args.startdate == None:
+#    args.startdate=dt.datetime(1970, 1, 1)
 
 try:
     cnx = db.connect('database/etfs.db')
@@ -26,10 +28,6 @@ finally:
 if len(all_rows)==0:
     print("No quotes available for the period specified:" + etf_period)
     sys.exit(0)
-
-#df=pd.DataFrame({'Date': [row[0] for row in all_rows], 'Close': [row[1] for row in all_rows]})
-#df.set_index(df['Date'], inplace=True)
-#print(df)
 
 start_date=dt.datetime.strptime(all_rows[0][0], '%Y-%m-%d')
 end_date=dt.datetime.strptime(all_rows[len(all_rows)-1][0], '%Y-%m-%d')
@@ -108,10 +106,12 @@ if  end_date != dt.datetime(start_date.year, 1, 1):
 number_years=difference.years + 365/remaining_days
 annual_return=(pow((end_price/start_price),(1/number_years))-1)*100
 
-print("Backtest")
-print("----------------------")
-print("Start date: " + str(start_date))
-print("End   date: " + str(end_date))
-print("----------------------")
-print("Cumulative return: %.2f %%" % cum_return_percentage)
-print("Annual return    : %.2f %%" % annual_return)
+print("")
+print("Backtest " + args.ticker)
+print("-------------------------")
+print("")
+print("-------------------------")
+print("Start date  | " + dt.datetime.strftime(start_date, '%Y-%m-%d'))
+print("Cum. return | %.2f %%" % cum_return_percentage)
+print("Ann. return | %.2f %%" % annual_return)
+print("-------------------------")
