@@ -14,10 +14,13 @@ args=parser.parse_args()
 if args.startdate == None:
     args.startdate=dt.datetime(1970, 1, 1)
 
+if args.enddate == None:
+    args.enddate=dt.datetime.now()
+
 try:
     cnx = db.connect('database/etfs.db')
     cur = cnx.cursor()
-    cur.execute('SELECT Date, Close FROM quotes WHERE Ticker="' + args.ticker + '" and Date >= ?', [args.startdate])
+    cur.execute('SELECT Date, Close FROM quotes WHERE Ticker="' + args.ticker + '" and Date >= ? and Date <= ?', [args.startdate, args.enddate])
     all_rows = cur.fetchall()
 except Exception as e:
     print('Failed to load quotes from database:')
@@ -112,6 +115,8 @@ print("-------------------------")
 print("")
 print("-------------------------")
 print("Start date  | " + dt.datetime.strftime(start_date, '%Y-%m-%d'))
+print("End date    | " + dt.datetime.strftime(end_date, '%Y-%m-%d'))
+print("-------------------------")
 print("Cum. return | %.2f %%" % cum_return_percentage)
 print("Ann. return | %.2f %%" % annual_return)
 print("-------------------------")
