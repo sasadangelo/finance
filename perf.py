@@ -4,6 +4,7 @@ import argparse
 from dateutil.relativedelta import relativedelta
 import sys
 import pandas as pd
+from calendar import isleap
 
 parser = argparse.ArgumentParser()
 parser.add_argument("ticker", help="Specify the ETF ticker")
@@ -17,10 +18,11 @@ if args.startdate == None:
 if args.enddate == None:
     args.enddate=dt.datetime.now()
 
+print(args.startdate)
 try:
     cnx = db.connect('database/etfs.db')
     cur = cnx.cursor()
-    cur.execute('SELECT Date, Close FROM quotes WHERE Ticker="' + args.ticker + '" and Date >= ? and Date <= ?', [args.startdate, args.enddate])
+    cur.execute('SELECT Date, Close FROM quotes WHERE Ticker="' + args.ticker + '" and Date >= "' + args.startdate.strftime('%Y-%m-%d') + '" and Date <= "' + args.enddate.strftime('%Y-%m-%d') + '"')
     all_rows = cur.fetchall()
 except Exception as e:
     print('Failed to load quotes from database:')
@@ -29,7 +31,7 @@ finally:
     cnx.close()
 
 if len(all_rows)==0:
-    print("No quotes available for the period specified:" + etf_period)
+    print("No quotes available for the period specified.")
     sys.exit(0)
 
 start_date=dt.datetime.strptime(all_rows[0][0], '%Y-%m-%d')
@@ -40,7 +42,7 @@ end_price=all_rows[len(all_rows)-1][1]
 # Cumulative Return
 # -----------------
 # Cumulative return is the percentage of total earning from start to finish of 
-# the investment. For example if you invested 1000$ in September 10th 2007 and
+# the investment. For example, if you invested 1000$ on September 10th 2007 and
 # you sold everything in February 10th 2011 at a prince of 1300$ you had a
 # cumulative return of 30%.
 #
@@ -52,11 +54,11 @@ cum_return_percentage=((end_price/start_price) - 1)*100
 # -----------------------
 # The Cumulative Return is a good measure to know the total return of an
 # investement and to compare two investments if they occurred on the same
-# period of time. A better measure on return is the Annual Return (or CAGR) 
+# period of time. A better measure of return is the Annual Return (or CAGR) 
 # because it calculate the return of the investment over a long period of
 # times (usually years) annually.
 # Suppose you have 100$ invested over 4 years and at the end of 4th year you 
-# sold everything and 146.41$.
+# sold everything at 146.41$.
 #
 # Initial capital: 100$
 # 2007: 110.00$	-> 10% earning
@@ -92,21 +94,14 @@ cum_return_percentage=((end_price/start_price) - 1)*100
 # Multiplying this value for 100 we get the original 10% growth rate you 
 # observed at the beginning of the example. Also for this formula are valid the
 # considerations about N when we have a date frame that is not perfectly a
-# multiple of one year. We need to calculate in this case the number of years 
-# and the exceeding time in days and then N=years + days/365.
+# multiple of one year.
 
 # Since we already have the start and end price, to calculate the annual return 
 # we need only to calculate N
-difference = relativedelta(end_date, start_date)
-
-remaining_days = 0
-if  start_date != dt.datetime(start_date.year, 1, 1):
-    end_first_year = dt.datetime(start_date.year, 12, 31)
-    remaining_days += (end_first_year - start_date).days
-if  end_date != dt.datetime(start_date.year, 1, 1):
-    begin_last_year = dt.datetime(end_date.year, 1, 1)
-    remaining_days += (end_date - begin_last_year).days
-number_years=difference.years + 365/remaining_days
+diffyears=end_date.year - start_date.year
+difference=end_date - start_date.replace(end_date.year)
+days_in_year=isleap(end_date.year) and 366 or 365
+number_years=diffyears + difference.days/days_in_year
 annual_return=(pow((end_price/start_price),(1/number_years))-1)*100
 
 print("")
