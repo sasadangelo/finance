@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 import sys
 import pandas as pd
 from calendar import isleap
-from tabulate import tabulate
+#from tabulate import tabulate
 
 parser = argparse.ArgumentParser()
 parser.add_argument("ticker", nargs='+', help="Specify the ETF ticker")
@@ -120,5 +120,5 @@ for ticker in args.ticker:
     print("Ann. return | %.2f %%" % annual_return)
     print("-------------------------")
 
-table = [["Start date", "2018-09-08"],["End date", "2018-07-06"],["Cum. return", "10.20%"],["Ann. return", "5.10%"]]
-print tabulate(table)
+#table = [["Start date", "2018-09-08"],["End date", "2018-07-06"],["Cum. return", "10.20%"],["Ann. return", "5.10%"]]
+#print tabulate(table)
