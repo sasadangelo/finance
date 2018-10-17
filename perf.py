@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 import sys
 import pandas as pd
 from calendar import isleap
-#from tabulate import tabulate
+from tabulate import tabulate
 
 parser = argparse.ArgumentParser()
 parser.add_argument("ticker", nargs='+', help="Specify the ETF ticker")
@@ -19,9 +19,13 @@ if args.startdate == None:
 if args.enddate == None:
     args.enddate=dt.datetime.now()
 
-print(args.startdate)
+output_report = [[""], ["Start date"], ["End date"], [""], ["Cum. return"], ["Ann. return"]]
+headers=['Backtest']
 
 for ticker in args.ticker:
+    output_report_row = []
+    headers.append(ticker)
+
     try:
         cnx = db.connect('database/etfs.db')
         cur = cnx.cursor()
@@ -44,12 +48,12 @@ for ticker in args.ticker:
 
     # Cumulative Return
     # -----------------
-    # Cumulative return is the percentage of total earning from start to finish 
+    # Cumulative return is the percentage of total earning from start to finish
     # of the investment. For example, if you invested 1000$ on September 10th
     # 2007 and you sold everything in February 10th 2011 at a prince of 1300$
     # 1300$ you had a cumulative return of 30%.
     #
-    # The formula to calculate the cumulative return is: 
+    # The formula to calculate the cumulative return is:
     # (end price/start price) -1
     # If you want the percentage number multiply the result for 100.
     cum_return_percentage=((end_price/start_price) - 1)*100
@@ -58,34 +62,34 @@ for ticker in args.ticker:
     # -----------------------
     # The Cumulative Return is a good measure to know the total return of an
     # investement and to compare two investments if they occurred on the same
-    # period of time. A better measure of return is the Annual Return (or CAGR) 
+    # period of time. A better measure of return is the Annual Return (or CAGR)
     # because it calculate the return of the investment over a long period of
     # times (usually years) annually.
-    # Suppose you have 100$ invested over 4 years and at the end of 4th year 
-    # sold everything at 146.41$.you 
+    # Suppose you have 100$ invested over 4 years and at the end of 4th year
+    # sold everything at 146.41$.you
     #
     # Initial capital: 100$
     # 2007: 110.00$ -> 10% earning
     # 2008: 121.00$ -> 10% earning
     # 2008: 133.10$ -> 10% earning
     # 2009: 146.41$ -> 10% earning
-    # 
-    # Your Cumulative earning was 46.41$ for a Cumulative Return of 46.41%. 
+    #
+    # Your Cumulative earning was 46.41$ for a Cumulative Return of 46.41%.
     # Now if you try to divide the cumulative return by 4 you get:
     #
     # Cumulative Return/4=11.60%
     #
-    # As you can see this is not a measure of the Annual Return because it 
-    # does not take in consideration the compound interest. In fact, this 
+    # As you can see this is not a measure of the Annual Return because it
+    # does not take in consideration the compound interest. In fact, this
     # formula measure the so called Average Annual Return.
     #
     # Average Annual Return=Cumulative Return/N
     #
-    # where N is the number of years. In a time series where start date is not 
-    # exactly January 1st and end date exactly the December 31th you should 
-    # count the number of years plus the additional days. For example, in a 
-    # date frame of Semptember 10th 2007 to February 10th 2011 we have 3 years 
-    # and 122 days. 
+    # where N is the number of years. In a time series where start date is not
+    # exactly January 1st and end date exactly the December 31th you should
+    # count the number of years plus the additional days. For example, in a
+    # date frame of Semptember 10th 2007 to February 10th 2011 we have 3 years
+    # and 122 days.
     # 122 days=122/365=0.33 years so N=3.33 years.
     #
     # The formula to calculate the Annual Return is:
@@ -95,12 +99,12 @@ for ticker in args.ticker:
     #
     # Annual Return=(146.41/100)^(1/4)-1=0,10
     #
-    # Multiplying this value for 100 we get the original 10% growth rate you 
-    # observed at the beginning of the example. Also for this formula are valid 
+    # Multiplying this value for 100 we get the original 10% growth rate you
+    # observed at the beginning of the example. Also for this formula are valid
     # the considerations about N when we have a date frame that is not perfectly
     # a multiple of one year.
 
-    # Since we already have the start and end price, to calculate the annual 
+    # Since we already have the start and end price, to calculate the annual
     # return we need only to calculate N
     diffyears=end_date.year - start_date.year
     difference=end_date - start_date.replace(end_date.year)
@@ -108,17 +112,10 @@ for ticker in args.ticker:
     number_years=diffyears + difference.days/days_in_year
     annual_return=(pow((end_price/start_price),(1/number_years))-1)*100
 
-    print("")
-    print("Backtest " + ticker)
-    print("-------------------------")
-    print("")
-    print("-------------------------")
-    print("Start date  | " + dt.datetime.strftime(start_date, '%Y-%m-%d'))
-    print("End date    | " + dt.datetime.strftime(end_date, '%Y-%m-%d'))
-    print("-------------------------")
-    print("Cum. return | %.2f %%" % cum_return_percentage)
-    print("Ann. return | %.2f %%" % annual_return)
-    print("-------------------------")
+    output_report[1].append(dt.datetime.strftime(start_date, '%Y-%m-%d'))
+    output_report[2].append(dt.datetime.strftime(end_date, '%Y-%m-%d'))
+    output_report[4].append("%.2f %%" % cum_return_percentage)
+    output_report[5].append("%.2f %%" % annual_return)
 
-#table = [["Start date", "2018-09-08"],["End date", "2018-07-06"],["Cum. return", "10.20%"],["Ann. return", "5.10%"]]
-#print tabulate(table)
+print("")
+print(tabulate(output_report,headers,tablefmt='orgtbl'))
