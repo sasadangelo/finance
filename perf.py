@@ -117,5 +117,23 @@ for ticker in args.ticker:
     output_report[4].append("%.2f %%" % cum_return_percentage)
     output_report[5].append("%.2f %%" % annual_return)
 
+    # Annual Volatity
+    # ---------------
+    # We are going to use Annual Volatility as a measure of risk. Suppose to
+    # have a price series:
+    #
+    # prices=(110.68, 111.559998, 109.879997, 109.099998,...,279.57)
+    #
+    # for each day d calculate the percentage change from previous day (d-1).
+    #
+    # Change %=Price(d)-Price(d-1)/Price(d-1)*100
+    #
+    # Luckly Python as a function that allow to calculate the percentage change
+    # on a series. In our example:
+    #
+    # prices change %=(n/a, 0.007951, -0.015059, -0.007099,..., -0.010161)
+    #prices=list(zip(*all_rows))[1]
+    #df = pd.DataFrame({'Close':list(prices)})
+    #print(df.pct_change())
 print("")
 print(tabulate(output_report,headers,tablefmt='orgtbl'))
