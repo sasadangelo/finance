@@ -6,6 +6,8 @@ import sys
 import pandas as pd
 from calendar import isleap
 from tabulate import tabulate
+import numpy as np
+import math as mt
 
 parser = argparse.ArgumentParser()
 parser.add_argument("ticker", nargs='+', help="Specify the ETF ticker")
@@ -19,7 +21,7 @@ if args.startdate == None:
 if args.enddate == None:
     args.enddate=dt.datetime.now()
 
-output_report = [[""], ["Start date"], ["End date"], [""], ["Cum. return"], ["Ann. return"]]
+output_report = [[""], ["Start date"], ["End date"], [""], ["Cum. return"], ["Ann. return"], ["Ann. volatility"]]
 headers=['Backtest']
 
 for ticker in args.ticker:
@@ -112,11 +114,6 @@ for ticker in args.ticker:
     number_years=diffyears + difference.days/days_in_year
     annual_return=(pow((end_price/start_price),(1/number_years))-1)*100
 
-    output_report[1].append(dt.datetime.strftime(start_date, '%Y-%m-%d'))
-    output_report[2].append(dt.datetime.strftime(end_date, '%Y-%m-%d'))
-    output_report[4].append("%.2f %%" % cum_return_percentage)
-    output_report[5].append("%.2f %%" % annual_return)
-
     # Annual Volatity
     # ---------------
     # We are going to use Annual Volatility as a measure of risk. Suppose to
@@ -132,8 +129,14 @@ for ticker in args.ticker:
     # on a series. In our example:
     #
     # prices change %=(n/a, 0.007951, -0.015059, -0.007099,..., -0.010161)
-    #prices=list(zip(*all_rows))[1]
-    #df = pd.DataFrame({'Close':list(prices)})
-    #print(df.pct_change())
+    prices=list(zip(*all_rows))[1]
+    df = pd.DataFrame({'Close':list(prices)})
+    annual_volatility=np.std(df['Close'].pct_change()*100)*mt.sqrt(252)
+
+    output_report[1].append(dt.datetime.strftime(start_date, '%Y-%m-%d'))
+    output_report[2].append(dt.datetime.strftime(end_date, '%Y-%m-%d'))
+    output_report[4].append("%.2f %%" % cum_return_percentage)
+    output_report[5].append("%.2f %%" % annual_return)
+    output_report[6].append("%.2f %%" % annual_volatility)
 print("")
 print(tabulate(output_report,headers,tablefmt='orgtbl'))
