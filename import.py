@@ -42,6 +42,27 @@ try:
             to_db[i] = (ticker,) + to_db[i]
         cur.executemany("INSERT INTO quotes (Ticker, Date, Open, High, Low, Close, Adj_Close, Volume) \
             VALUES (?, ?, ?, ?, ?, ?, ?, ?);", to_db)
+
+    print("Import Dividends ...")
+    cur.execute('DROP TABLE IF EXISTS dividends;')
+
+    sql = '''CREATE TABLE dividends ('Ticker' TEXT, 'Date' REAL, 'Dividend' REAL, 'Pay_Date' REAL, \
+        PRIMARY KEY('Ticker', 'Date'), FOREIGN KEY('Ticker') REFERENCES etfs('Ticker'))'''
+ 
+    cur.execute(sql)
+
+    for etf_dividends_csv in os.listdir('database/dividends'):
+        ticker = etf_dividends_csv[:-4]
+        print('Import dividends ETF: ' + ticker)
+        with open('database/dividends/' + etf_dividends_csv) as csvfile:
+            reader = csv.DictReader(csvfile)
+            to_db = [(row['Date'], row['Dividend'], row['Pay Date']) for row in reader]
+ 
+        for i in range(len(to_db)):
+            to_db[i] = (ticker,) + to_db[i]
+
+        cur.executemany("INSERT INTO dividends (Ticker, Date, Dividend, Pay_Date) VALUES (?, ?, ?, ?);", to_db)
+ 
     cnx.commit()
 except Exception as e:
     print('Exception:')
