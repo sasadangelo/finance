@@ -9,6 +9,12 @@ from tabulate import tabulate
 import numpy as np
 import math as mt
 
+def sumColumn(m, column):
+    total = 0
+    for row in range(len(m)):
+        total += m[row][column]
+    return total
+
 parser = argparse.ArgumentParser()
 parser.add_argument("ticker", nargs='+', help="Specify the ETF ticker")
 parser.add_argument("-s", "--startdate", type=lambda d: dt.datetime.strptime(d, '%Y-%m-%d'), help="Specify start date for backtest period (YYYY-mm-dd)")
@@ -32,21 +38,36 @@ for ticker in args.ticker:
         cnx = db.connect('database/etfs.db')
         cur = cnx.cursor()
         cur.execute('SELECT Date, Close FROM quotes WHERE Ticker="' + ticker + '" and Date >= "' + args.startdate.strftime('%Y-%m-%d') + '" and Date <= "' + args.enddate.strftime('%Y-%m-%d') + '"')
-        all_rows = cur.fetchall()
+        all_quotes = cur.fetchall()
     except Exception as e:
         print('Failed to load quotes from database:')
         print(e)
     finally:
         cnx.close()
 
-    if len(all_rows)==0:
+    try:
+        cnx = db.connect('database/etfs.db')
+        cur = cnx.cursor()
+        cur.execute('SELECT Date, Dividend FROM dividends WHERE Ticker="' + ticker + '" and Date >= "' + args.startdate.strftime('%Y-%m-%d') + '" and Date <= "' + args.enddate.strftime('%Y-%m-%d') + '"')
+        all_dividends = cur.fetchall()
+    except Exception as e:
+        print('Failed to load dividends from database:')
+        print(e)
+    finally:
+        cnx.close()
+
+    if len(all_quotes)==0:
         print("No quotes available for the period specified.")
         sys.exit(0)
 
-    start_date=dt.datetime.strptime(all_rows[0][0], '%Y-%m-%d')
-    end_date=dt.datetime.strptime(all_rows[len(all_rows)-1][0], '%Y-%m-%d')
-    start_price=all_rows[0][1]
-    end_price=all_rows[len(all_rows)-1][1]
+    start_date=dt.datetime.strptime(all_quotes[0][0], '%Y-%m-%d')
+    end_date=dt.datetime.strptime(all_quotes[len(all_quotes)-1][0], '%Y-%m-%d')
+    start_price=all_quotes[0][1]
+    end_price=all_quotes[len(all_quotes)-1][1]
+
+    total_dividend=0
+    if len(all_dividends)!=0:
+       total_dividend=sumColumn(all_dividends, 1)
 
     # Cumulative Return
     # -----------------
@@ -58,7 +79,7 @@ for ticker in args.ticker:
     # The formula to calculate the cumulative return is:
     # (end price/start price) -1
     # If you want the percentage number multiply the result for 100.
-    cum_return_percentage=((end_price/start_price) - 1)*100
+    cum_return_percentage=(((end_price+total_dividend)/start_price) - 1)*100
 
     # Annual Return (or CAGR)
     # -----------------------
@@ -112,7 +133,8 @@ for ticker in args.ticker:
     difference=end_date - start_date.replace(end_date.year)
     days_in_year=isleap(end_date.year) and 366 or 365
     number_years=diffyears + difference.days/days_in_year
-    annual_return=(pow((end_price/start_price),(1/number_years))-1)*100
+    #print(number_years)
+    annual_return=(pow(((end_price+total_dividend)/start_price),(1/number_years))-1)*100
 
     # Annual Volatity
     # ---------------
@@ -129,7 +151,7 @@ for ticker in args.ticker:
     # on a series. In our example:
     #
     # prices change %=(n/a, 0.007951, -0.015059, -0.007099,..., -0.010161)
-    prices=list(zip(*all_rows))[1]
+    prices=list(zip(*all_quotes))[1]
     df = pd.DataFrame({'Close':list(prices)})
     annual_volatility=np.std(df['Close'].pct_change()*100)*mt.sqrt(252)
 
