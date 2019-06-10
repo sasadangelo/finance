@@ -133,7 +133,6 @@ for ticker in args.ticker:
     difference=end_date - start_date.replace(end_date.year)
     days_in_year=isleap(end_date.year) and 366 or 365
     number_years=diffyears + difference.days/days_in_year
-    #print(number_years)
     annual_return=(pow(((end_price+total_dividend)/start_price),(1/number_years))-1)*100
 
     # Annual Volatity
