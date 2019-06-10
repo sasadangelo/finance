@@ -229,3 +229,7 @@ Da ciò si capisce che MSCI World fornisce grosso modo il seguente rischio/ritor
 Miglior Performance                |19.29 (2014)|22.59 (2009)|19.69 (2014)|23.99 (2009)|19.85 (2014)|24.12 (2009)|
 Peggior Performance (escluso 2008) |-5.03 (2018)|-4.72 (2018)|-4.76 (2018)|-4.59 (2018)|-5.81 (2011)|-5.71 (2007)|
 
+Probabilità che sia < -4% è 15.85% infatti nel 68.3% dei casi il ritorno sta tra -4% e 26%, quindi nel 31.7 % dei casi sta ai bordi, poiché a
+noi interessa solo la parte negativa allora sarà 31.7/2=15.85%. Quindi 1 volta ogni 6 anni mi aspetto di avere un ritorno inferiore al -4%.
+Probabilità che sia < -19% è del 2.25%. Una volta ogni 44 anni mi aspetto di avere un ritorno inferiore a -19%.
+Probabilità che sia < -34% è del 0.15%. Una volta ogni 670 anni mi aspetto di avere un ritorno inferiore a -34%.
