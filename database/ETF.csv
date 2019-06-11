@@ -1,11 +1,13 @@
 Name,ISIN,Ticker,LaunchDate,Capital,Replication,Volatility,Currency,Cost,Dividend,DividendFrequency,Yeld
 Lyxor MSCI World UCITS ETF D-EUR,FR0010315770,WLD.MI,26 aprile 2006,1480,Sintetica (Unfunded swap),9.33,EUR,0.3,Distribuzione,Semestrale,12.37
-Amundi ETF MSCI World UCITS ETF EUR,FR0010756098,CW8.MI,16 giugno 2009,646,Sintetica (Unfunded swap) ,9.46,EUR,0.33,Accumulazione,,12.25
+Amundi ETF MSCI World UCITS ETF EUR,FR0010756098,CW8.MI,16 giugno 2009,646,Sintetica (Unfunded swap) ,9.46,EUR,0.33,Accumulazione,,-
 Amundi ETF MSCI World UCITS ETF DR,LU1437016972,MWRD.MI,17 novembre 2016,16,Fisica (Replica totale),-,EUR,0.18,Accumulazione,,-
 HSBC MSCI World UCITS ETF USD,IE00B4X9L533,HMWD.MI,8 Dicembre 2010,246,Fisica a campionamento,9.85,USD,0.15,Distribuzione,Trimestrale,11.93
-iShares Core MSCI World UCITS ETF,IE00B4L5Y983,SWDA.MI,25 Settembre 2009,9233,Fisica a campionamento,10,USD,0.2,Accumulazione,,11.78
-db x-trackers MSCI World Index UCITS ETF (DR) 1C,IE00BJ0KDQ92,XDWD.MI,22 Luglio 2014,1652,Fisica a campionamento,9.99,USD,0.19,Accumulazione,,11.74
-db x-trackers MSCI World Index UCITS ETF 1C,LU0274208692,XMWO.MI,19 dicembre 2006,,Sintetica (Unfunded swap) ,9.99,USD,0.45,Accumulazione,,11.74
+iShares Core MSCI World UCITS ETF,IE00B4L5Y983,SWDA.MI,25 Settembre 2009,9233,Fisica a campionamento,10,USD,0.2,Accumulazione,,-
+db x-trackers MSCI World Index UCITS ETF (DR) 1C,IE00BJ0KDQ92,XDWD.MI,22 Luglio 2014,1652,Fisica a campionamento,9.99,USD,0.19,Accumulazione,,-
+db x-trackers MSCI World Index UCITS ETF 1C,LU0274208692,XMWO.MI,19 dicembre 2006,,Sintetica (Unfunded swap) ,9.99,USD,0.45,Accumulazione,,-
 iShares MSCI World UCITS ETF (Dist),IE00B0M62Q58,IWRD.MI,28 ottobre 2005,4516,Fisica a campionamento,9.94,USD,0.5,Distribuzione,Trimestrale,11.78
-Invesco MSCI World UCITS ETF,IE00B60SX394,SMSWLD.MI,2 aprile 2009,743,Sintetica (Unfunded swap) ,9.99,USD,0.19,Accumulazione,,11.72
+Invesco MSCI World UCITS ETF,IE00B60SX394,SMSWLD.MI,2 aprile 2009,743,Sintetica (Unfunded swap) ,9.99,USD,0.19,Accumulazione,,-
 UBS ETF (LU) MSCI World UCITS ETF (USD) A-dis,LU0340285161,WRDEUA.MI,25 giugno 2008,1031,Fisica (Replica totale),9.89,USD,0.3,Distribuzione,Semestrale,11.5
+iShares Euro Government Bond 1-3yr UCITS ETF (Acc),IE00B3VTMJ91,CSBGE3.MI,2 Giugno 2009,447,Fisica a campionamento,0.86,EUR,0.2,Accumulazione,,-
+iShares Euro Government Bond 1-3yr UCITS ETF (Dist),IE00B14X4Q57,IBGS.MI,5 giugno 2006,1445,Fisica a campionamento,0.86,EUR,0.2,Distribuzione,Semestrale,-
