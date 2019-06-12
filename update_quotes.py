@@ -31,5 +31,5 @@ with open('database/ETF.csv') as csvfile:
             with open(csv_file_path, "a") as csv_file:
                 df.to_csv(csv_file, header=False)
         else:
-            df = web.get_data_yahoo(row['Ticker'], start, end)
+            df = web.get_data_yahoo(row['Ticker'], start_date, end_date)
             df.to_csv('database/quotes/' + row['Ticker'] + '.csv')
