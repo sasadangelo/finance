@@ -1,5 +1,5 @@
-ETF eligible for my portfolio:
-------------------------------
+Stock ETF eligible for my portfolio:
+------------------------------------
 XMWO.MI		-> accumulazione
 SWDA.MI		-> accumulazione
 CW8.MI		-> accumulazione
@@ -233,3 +233,15 @@ Probabilità che sia < -4% è 15.85% infatti nel 68.3% dei casi il ritorno sta t
 noi interessa solo la parte negativa allora sarà 31.7/2=15.85%. Quindi 1 volta ogni 6 anni mi aspetto di avere un ritorno inferiore al -4%.
 Probabilità che sia < -19% è del 2.25%. Una volta ogni 44 anni mi aspetto di avere un ritorno inferiore a -19%.
 Probabilità che sia < -34% è del 0.15%. Una volta ogni 670 anni mi aspetto di avere un ritorno inferiore a -34%.
+
+Here a list of Bond I decided to filter out from my portfolio and the reason.
+-----------------------------------------------------------------------------
+CSBGE3.MI	Low annual return
+IBGS.MI		Low annual return
+LGOV.MI		Too recent
+
+Bond ETF eligible for my portfolio:
+-----------------------------------
+IBGM.MI
+IBGZ.MI
+IBGL.MI
