@@ -26,4 +26,3 @@ with open('database/ETF.csv') as csvfile:
             print("Download quotes for ETF ", row['Name'])
             df = web.get_data_yahoo(row['Ticker'], start, end)
             df.to_csv('database/quotes/' + row['Ticker'] + '.csv')
-               
