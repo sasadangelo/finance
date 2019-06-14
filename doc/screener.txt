@@ -235,13 +235,17 @@ Probabilità che sia < -19% è del 2.25%. Una volta ogni 44 anni mi aspetto di a
 Probabilità che sia < -34% è del 0.15%. Una volta ogni 670 anni mi aspetto di avere un ritorno inferiore a -34%.
 
 Here a list of Bond I decided to filter out from my portfolio and the reason.
+(current filter= too recent + low annual return)
 -----------------------------------------------------------------------------
 CSBGE3.MI	Low annual return
 IBGS.MI		Low annual return
 LGOV.MI		Too recent
+CSBGE7.MI       Low annual return
 
 Bond ETF eligible for my portfolio:
 -----------------------------------
 IBGM.MI
 IBGZ.MI
 IBGL.MI
+EMG.MI
+EM13.MI
