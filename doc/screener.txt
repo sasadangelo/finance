@@ -242,6 +242,7 @@ IBGS.MI		Low annual return
 LGOV.MI		Too recent
 CSBGE7.MI       Low annual return
 EM35.MI         Low annual return
+C13.MI          Low annual return
 
 Bond ETF eligible for my portfolio:
 -----------------------------------
@@ -253,3 +254,4 @@ EM13.MI
 EM15.MI
 EM1015.MI
 EM57.MI
+EM710.MI
