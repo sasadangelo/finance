@@ -244,6 +244,12 @@ CSBGE7.MI       Low annual return
 EM35.MI         Low annual return
 C13.MI          Low annual return
 C33.MI		Low annual return
+AAA13.MI	Low annual return
+AAA35.MI	Low annual return
+AAA57.MI	Low annual return
+X35E.MI		Low annual return
+X35E.MI		Low annual return
+X35E.MI		Low annual return
 
 Bond ETF eligible for my portfolio:
 -----------------------------------
@@ -259,3 +265,9 @@ EM710.MI
 C10.MI
 C53.MI
 C73.MI
+EMAAA.MI
+X105.MI
+X15E.MI
+X25E.MI
+X57E.MI
+X710.MI
