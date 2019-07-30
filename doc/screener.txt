@@ -288,4 +288,19 @@ EM710.MI --> 30
 SWDA.MI  --> 80         6.47/5.00
 EM710.MI --> 20
 
+Profilo Rischio
+---------------
+Prudente	20/80
+Conservativo	30/70
+Dinamico	40/60
+Aggressivo	60/40
+
+| Backtest        | prudente   | conservativo   | dinamico   | aggressivo   |
+|-----------------+------------+----------------+------------+--------------|
+|                 |            |                |            |              |
+| Start date      | 2019-01-02 | 2019-01-02     | 2019-01-02 | 2019-01-02   |
+| End date        | 2019-06-21 | 2019-06-21     | 2019-06-21 | 2019-06-21   |
+|                 |            |                |            |              |
+| Cum. return     | 8.02 %     | 9.31 %         | 10.60 %    | 13.18 %      |
+| Ann. volatility | 3.26 %     | 3.91 %         | 4.75 %     | 6.70 %       |
 
