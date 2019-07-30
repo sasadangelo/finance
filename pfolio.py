@@ -33,19 +33,20 @@ output_report = [[""], ["Start date"], ["End date"], [""], ["Cum. return"], ["An
 headers=['Backtest']
 
 for portfolio in args.portfolio:
+    headers.append(portfolio)
     with open('pfolio/' + portfolio + '.csv') as csvfile:
         reader = csv.DictReader(csvfile)
         cum_return_percentage=0
         annual_return=0
         annual_variance=0
         total_allocation=0
+
         for row in reader:
             ticker=row['Ticker']
             allocation=int(row['Allocation'])
             total_allocation=total_allocation+allocation
 
             output_report_row = []
-            headers.append(args.portfolio)
 
             try:
                 cnx = db.connect('database/etfs.db')

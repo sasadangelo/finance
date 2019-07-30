@@ -278,4 +278,14 @@ IBGL.MI		(15-30)
 EMG.MI
 EMAAA.MI
 XGLE.MI <-- BEST
-XY4P.MI	
+XY4P.MI
+
+My Best Portfolio       Return/Risk
+-----------------------------------
+SWDA.MI  --> 70		7.10/5.90
+EM710.MI --> 30
+
+SWDA.MI  --> 80         6.47/5.00
+EM710.MI --> 20
+
+
