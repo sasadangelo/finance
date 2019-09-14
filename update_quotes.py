@@ -27,7 +27,11 @@ with open('database/ETF.csv') as csvfile:
                 last_quote_date=list(csv.reader(csv_file))[-1][0]
             last_update_date = dt.datetime.strptime(last_quote_date, '%Y-%m-%d')
             last_update_date += dt.timedelta(days=1)
-            df = web.get_data_yahoo(row['Ticker'], last_update_date, end_date)
+            try:
+                df = web.get_data_yahoo(row['Ticker'], last_update_date, end_date)
+            except Exception as e:
+                print("Cannot download quotes for ",row['Ticker']," for the specified period: [", last_update_date, ", ", end_date)
+                print(getattr(e, 'message', repr(e)))
             with open(csv_file_path, "a") as csv_file:
                 df.to_csv(csv_file, header=False)
         else:
