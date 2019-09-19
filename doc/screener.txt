@@ -286,6 +286,7 @@ XGLE.MI <-- BEST
 XY4P.MI
 GOVY.MI
 SEGA.MI
+IEAG.MI
 
 My Best Portfolio       Return/Risk
 -----------------------------------
