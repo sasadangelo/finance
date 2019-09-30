@@ -319,3 +319,24 @@ ALL SEASONS
 40%	Long term Bond		Amundi ETF Government Bond EuroMTS Broad Investment Grade 10-15 UCITS ETF
 7,5% 	Gold			ETFS Physical Gold
 7,5% 	Commodity 		Lyxor Commodities Thomson Reuters/CoreCommodity CRB TR UCITS ETF C-EUR
+
+S&P 500
+-------
+
+A prima vista gli ETF garantiscono un ritorno maggiore ma sono anche più rischiosi.
+
+Here a list of quotes I decided to filter out from my portfolio and the reason.
+--------------------------------------------------------------------------------
+HSPD.MI		few quotes
+VUSA.MI		few quotes
+
+Stock ETF eligible for my portfolio:
+------------------------------------
+SPXS.MI 	-> Accumulazione
+CSSPX.MI	-> Accumulazione
+XSPX.MI		-> Accumulazione
+
+IUSA.MI		-> Distribuzione 
+SPX.MI		-> Distribuzione
+SPY5.MI 	-> Distribuzione
+SP5EUY.MI 	-> Distribuzione
