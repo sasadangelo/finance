@@ -312,3 +312,10 @@ Aggressivo	60/40
 | Cum. return     | 8.02 %     | 9.31 %         | 10.60 %    | 13.18 %      |
 | Ann. volatility | 3.26 %     | 3.91 %         | 4.75 %     | 6.70 %       |
 
+ALL SEASONS
+-----------
+30%	Stock			iShares Core EURO STOXX 50 UCITS ETF (Acc)
+15%	Intermediate Bond	Lyxor EuroMTS 7-10Y Investment Grade (DR) C-EUR
+40%	Long term Bond		Amundi ETF Government Bond EuroMTS Broad Investment Grade 10-15 UCITS ETF
+7,5% 	Gold			ETFS Physical Gold
+7,5% 	Commodity 		Lyxor Commodities Thomson Reuters/CoreCommodity CRB TR UCITS ETF C-EUR
