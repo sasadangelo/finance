@@ -9,7 +9,7 @@ from pathlib import Path
 yf.pdr_override() # <== that's all it takes :-)
 
 start_date = dt.datetime(1970, 1, 1)
-end_date = dt.datetime.now()
+end_date = dt.datetime.now() - timedelta(days=1)
 
 # Read ETF.csv file in order to iterate through all the ETF in our database
 with open('database/ETF.csv') as csvfile:
