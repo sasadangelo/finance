@@ -2,15 +2,14 @@ import datetime as dt
 import pandas as pd
 pd.core.common.is_list_like = pd.api.types.is_list_like
 import pandas_datareader.data as web
-import fix_yahoo_finance as yf
+import yfinance as yf
 import csv
 from pathlib import Path
 
 yf.pdr_override() # <== that's all it takes :-)
 
 start_date = dt.datetime(1970, 1, 1)
-end_date = dt.datetime.now() - timedelta(days=1)
-
+end_date = dt.datetime.now() - dt.timedelta(days=1)
 # Read ETF.csv file in order to iterate through all the ETF in our database
 with open('database/ETF.csv') as csvfile:
     reader = csv.DictReader(csvfile)
