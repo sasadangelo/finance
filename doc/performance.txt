@@ -1,0 +1,16 @@
+Performance 2019
+----------------
+Tutti i portafogli sono composti da:
+- SWDA.MI
+- EM710.MI
+
+con la seguente asset allocation:
+- prudente: 20/80
+- conservativo: 30/70
+- dinamico: 40/60
+- aggressivo: 50/50
+
+| Backtest        | prudente   | conservativo   | dinamico   | aggressivo   |
+|-----------------+------------+----------------+------------+--------------|
+| Return          | 10.81 %    | 13.18 %        | 15.56 %    | 17.93 %      |
+| Volatility      | 3.76 %     | 4.44 %         | 5.33 %     | 6.36 %       |
