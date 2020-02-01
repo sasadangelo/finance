@@ -43,7 +43,6 @@ for portfolio in args.portfolio:
 
         for row in reader:
             ticker=row['Ticker']
-            print(ticker)
             allocation=int(row['Allocation'])
             total_allocation=total_allocation+allocation
 
