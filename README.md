@@ -15,8 +15,11 @@ Here the command to download the project and run it:
 ```
 git clone https://github.com/sasadangelo/finance
 cd finance
+pip3 install pandas --user
 pip3 install pandas_datareader --user
-pip3 install fix_yahoo_finance --user
+pip3 install yfinance --user
+pip3 install matplotlib --user
+pip3 install tabulate --user
 ```
 
 The project include the file database/ETF.csv where you should insert the ETF you are interested in. The project already has the quotes for ETF listed in database/ETF.csv file but if you insert a new ETF you need to download its quotes with the following command:
@@ -28,7 +31,7 @@ python3 download.py <ticker>
 You can update quotes for all the ETF in database/ETF.csv with the following command:
 
 ```
-python3 update_quotes.py
+./update_quotes.sh
 ```
 
 Once you have all ETF with all quotes downloaded in database/quotes/\*.csv you can import them in the database **databse/etfs.db** with the following command:
