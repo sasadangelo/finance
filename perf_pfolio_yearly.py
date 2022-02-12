@@ -22,29 +22,37 @@ parser.add_argument("-s", "--startdate", type=lambda d: dt.datetime.strptime(d, 
 parser.add_argument("-e", "--enddate", type=lambda d: dt.datetime.strptime(d, '%Y-%m-%d'), help="Specify end date for backtest period (YYYY-mm-dd)")
 args=parser.parse_args()
 
+# The Backtest has a start and end date.
+# By default, startdate=1970/01/01
+#             enddate=now
 if args.startdate == None:
     args.startdate=dt.datetime(1970, 1, 1)
 
 if args.enddate == None:
     args.enddate=dt.datetime.now()
 
-output_report = [["2019"], ["2018"], ["2017"], ["2016"], ["2015"], ["2014"], ["2013"], ["2012"], ["2011"], ["2010"], ["2009"], ["2008"], ["2007"], ["2006"], ["2005"]]
+output_report = [["2022"],["2021"],["2020"],["2019"], ["2018"], ["2017"], ["2016"], ["2015"], ["2014"], ["2013"], ["2012"], ["2011"], ["2010"], ["2009"], ["2008"], ["2007"], ["2006"], ["2005"]]
 headers=['Backtest']
 
+#Run the Yearly Backtest for each input Portfolio
 for portfolio in args.portfolio:
     headers.append(portfolio)
+    # Open the portfolio in the pfolio folder. It is a csv file.
     with open('pfolio/' + portfolio + '.csv') as csvfile:
         reader = csv.DictReader(csvfile)
         total_allocation=0
 
+        # Each portfolio is a CSV with N rows.
+        # Each row is an ETF Ticker and its allocation percentage in the portfolio.
         for row in reader:
+            # Retrieve the ticker and the allocation percentage for the ETF in the portfolio.
             ticker=row['Ticker']
             print(ticker)
             allocation=int(row['Allocation'])
             total_allocation=total_allocation+allocation
 
             output_report_row = []
-
+            # Retrieve all the quotes, for the ETF, in the specified period.
             try:
                 cnx = db.connect('database/etfs.db')
                 cur = cnx.cursor()
@@ -56,10 +64,12 @@ for portfolio in args.portfolio:
             finally:
                 cnx.close()
 
+            # Make sure quotes are available
             if len(all_quotes)==0:
                 print("No quotes available for the period specified.")
                 sys.exit(0)
 
+            # Retrieve all the dividends, for the ETF, in the specified period.
             try:
                 cnx = db.connect('database/etfs.db')
                 cur = cnx.cursor()
@@ -76,15 +86,19 @@ for portfolio in args.portfolio:
             df_quotes = pd.DataFrame(all_quotes, columns = ["Date", "Close"])
             df_dividends= pd.DataFrame(all_dividends, columns = ["Date", "Dividend"])
             index = 0
+            # For each year in the year list
             for year in years_list:
+                # start_date=year/01/01
+                # end_date=year/12/31
                 start_date=dt.datetime(year, 1, 1)
                 end_date=dt.datetime(year, 12, 31)
+                # Retried the Start and End price for the year
                 year_df_quotes=df_quotes.loc[(df_quotes['Date'] >= start_date.strftime("%Y-%m-%d")) & (df_quotes['Date'] <= end_date.strftime("%Y-%m-%d"))]
                 start_price=year_df_quotes['Close'].values[0]
                 end_price=year_df_quotes['Close'].values[-1]
 
+                # Calculate the dividend for that year
                 year_df_dividends=df_dividends.loc[(df_dividends['Date'] >= start_date.strftime("%Y-%m-%d")) & (df_dividends['Date'] <= end_date.strftime("%Y-%m-%d"))]
-
                 total_dividend=0
                 if len(all_dividends)!=0:
                     total_dividend=sumColumn(year_df_dividends['Dividend'].tolist())
