@@ -13,26 +13,21 @@
                 </h2>
                 <table class="table table-hover table-dark">
                     <tr>
-                        <th>ISIN</th>
-                        <th>Nome</th>
                         <th>Ticker</th>
-                        <th>Volatilità</th>
-                        <th>Dividendo</th>
+                        <th>Nome</th>
                         <th></th>
                     </tr>
+                    {% for row in etfs %}
                     <tr>
-                        <td>FR0010315770</td>
-                        <td>Lyxor MSCI World UCITS ETF D-EUR</td>
-                        <td>WLD.MI</td>
-                        <td>9.33</td>
-                        <td>Distribuzione</td>
+                        <td>{{row.ticker}}</td>
+                        <td>{{row.name}}</td>
                         <td>
                             <a href="" class="btn btn-warning btn-xs" data-toggle="modal" data-target="">Edit</a>
                             <a href="" class="btn btn-danger btn-xs" onclick="return confirm('Are You Sure To Delete ?')">Delete</a>
                         </td>
                     </tr>
+                    {% endfor %}
                 </table>
-           
         </div>
     </div>
 </div>
