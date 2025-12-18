@@ -1,10 +1,10 @@
 import os
-from flask import Flask
 from database import db
+from flask import Flask
 
 # SqlAlchemy Database Configuration With SqlLite
 project_dir = os.path.dirname(os.path.abspath(__file__))
-database_file = "sqlite:///{}".format(os.path.join(project_dir, "../database/etfs.db"))
+database_file = "sqlite:///{}".format(os.path.join(project_dir, "database/etfs.db"))
 
 app = Flask(__name__)
 app.secret_key = "Secret Key"

@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 import datetime as dt
 import csv
 from pathlib import Path
