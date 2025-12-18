@@ -1,16 +1,22 @@
 import os
-from flask import Flask, render_template
-from flask_sqlalchemy import SQLAlchemy
- 
+from flask import Flask
+from database import db
+
 # SqlAlchemy Database Configuration With SqlLite
 project_dir = os.path.dirname(os.path.abspath(__file__))
 database_file = "sqlite:///{}".format(os.path.join(project_dir, "../database/etfs.db"))
 
 app = Flask(__name__)
 app.secret_key = "Secret Key"
-app.config["SQLALCHEMY_DATABASE_URI"] = database_file 
+app.config["SQLALCHEMY_DATABASE_URI"] = database_file
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-db = SQLAlchemy(app)
+# Initialize db with app
+db.init_app(app)
 
-import etfs
-import etfs_routes
+# Import routes after app and db initialization
+with app.app_context():
+    import etfs_routes
+
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5000)
