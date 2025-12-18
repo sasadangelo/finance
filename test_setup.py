@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# -----------------------------------------------------------------------------
+# Copyright (c) 2025 Salvatore D'Angelo, Code4Projects
+# Licensed under the MIT License. See LICENSE.md for details.
+# -----------------------------------------------------------------------------
 """
 Quick test script to verify the UV setup is working correctly.
 Run with: uv run python test_setup.py
@@ -34,16 +38,19 @@ def test_imports():
             failed.append(package_name)
 
     if failed:
-        print(f"\n❌ Failed to import: {', '.join(failed)}")
+        print(f"
+❌ Failed to import: {', '.join(failed)}")
         return False
     else:
-        print("\n✅ All packages imported successfully!")
+        print("
+✅ All packages imported successfully!")
         return True
 
 
 def test_python_version():
     """Test Python version."""
-    print(f"\nPython version: {sys.version}")
+    print(f"
+Python version: {sys.version}")
     version_info = sys.version_info
 
     if version_info.major == 3 and version_info.minor >= 13:
@@ -58,7 +65,8 @@ def test_database_access():
     """Test database file exists."""
     import os
 
-    print("\nChecking database files...")
+    print("
+Checking database files...")
 
     files = [
         "database/ETF.csv",
@@ -88,15 +96,18 @@ def main():
 
     results = []
     for test_name, test_func in tests:
-        print(f"\n{'=' * 60}")
+        print(f"
+{'=' * 60}")
         print(f"Test: {test_name}")
         print("=" * 60)
         results.append(test_func())
 
-    print("\n" + "=" * 60)
+    print("
+" + "=" * 60)
     if all(results):
         print("✅ All tests passed! Setup is complete.")
-        print("\nYou can now run:")
+        print("
+You can now run:")
         print("  uv run python download.py -t VUSA.MI")
         print("  uv run python graph.py VUSA.MI")
         print("  uv run python perf.py VUSA.MI")

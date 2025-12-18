@@ -1,3 +1,7 @@
+# -----------------------------------------------------------------------------
+# Copyright (c) 2025 Salvatore D'Angelo, Code4Projects
+# Licensed under the MIT License. See LICENSE.md for details.
+# -----------------------------------------------------------------------------
 import sqlite3 as db
 import csv
 import os
@@ -92,9 +96,7 @@ try:
         for i in range(len(to_db)):
             to_db[i] = (ticker,) + to_db[i]
 
-        cur.executemany(
-            "INSERT INTO dividends (Ticker, Date, Dividend, Pay_Date) VALUES (?, ?, ?, ?);", to_db
-        )
+        cur.executemany("INSERT INTO dividends (Ticker, Date, Dividend, Pay_Date) VALUES (?, ?, ?, ?);", to_db)
 
     cnx.commit()
 except Exception as e:

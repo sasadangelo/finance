@@ -1,3 +1,7 @@
+# -----------------------------------------------------------------------------
+# Copyright (c) 2025 Salvatore D'Angelo, Code4Projects
+# Licensed under the MIT License. See LICENSE.md for details.
+# -----------------------------------------------------------------------------
 from __future__ import annotations
 import datetime as dt
 import csv
@@ -151,8 +155,6 @@ def update_ticker(ticker: str, name: str | None = None) -> None:
 # -----------------------------------------------------------------------------
 # Entry point
 # -----------------------------------------------------------------------------
-
-
 def main() -> None:
     args = parse_args()
 

@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# -----------------------------------------------------------------------------
+# Copyright (c) 2025 Salvatore D'Angelo, Code4Projects
+# Licensed under the MIT License. See LICENSE.md for details.
+# -----------------------------------------------------------------------------
 """
 Script to fix CSV files precision by rounding all numeric values to 2 decimal places.
 This ensures consistency across all historical data.
@@ -61,16 +65,19 @@ def main():
             error_count += 1
 
     print("=" * 60)
-    print(f"\nSummary:")
+    print(f"
+Summary:")
     print(f"  Success: {success_count}")
     print(f"  Errors:  {error_count}")
     print(f"  Total:   {len(csv_files)}")
 
     if error_count == 0:
-        print("\n✅ All CSV files have been fixed!")
+        print("
+✅ All CSV files have been fixed!")
         return 0
     else:
-        print(f"\n⚠️  {error_count} files had errors")
+        print(f"
+⚠️  {error_count} files had errors")
         return 1
 
 

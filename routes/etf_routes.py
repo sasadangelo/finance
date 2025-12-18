@@ -1,3 +1,7 @@
+# -----------------------------------------------------------------------------
+# Copyright (c) 2025 Salvatore D'Angelo, Code4Projects
+# Licensed under the MIT License. See LICENSE.md for details.
+# -----------------------------------------------------------------------------
 from flask import Blueprint
 from controllers.etf_controller import EtfController
 
@@ -46,6 +50,12 @@ def update(ticker):
 @etf_bp.route("/etfs/<string:ticker>/delete", methods=["POST"])
 def delete(ticker):
     return EtfController.delete(ticker)
+
+
+# Route per ottenere i dati delle quotazioni (API JSON)
+@etf_bp.route("/etfs/<string:ticker>/quotes")
+def get_quotes(ticker):
+    return EtfController.get_quotes(ticker)
 
 
 # Made with Bob
