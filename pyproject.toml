@@ -1,0 +1,85 @@
+[project]
+authors = [
+  {name = "Salvatore D'Angelo", email = "sasadangelo@gmail.com"},
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Financial and Insurance Industry",
+  "Topic :: Office/Business :: Financial :: Investment",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
+description = "ETF Portfolio Manager - Monitor and analyze ETF performance"
+keywords = ["etf", "finance", "portfolio", "investment", "analysis"]
+license = {text = "MIT"}
+name = "etf-finance"
+readme = "README.md"
+requires-python = ">=3.12"
+version = "1.0.0"
+
+dependencies = [
+  # Core data processing
+  "pandas>=2.2.0",
+  "numpy>=1.26.0", # Financial data
+  "pandas-datareader>=0.10.0",
+  "yfinance>=0.2.36", # Visualization
+  "matplotlib>=3.8.0", # Utilities
+  "tabulate>=0.9.0",
+  "python-dateutil>=2.8.2",
+  "setuptools>=69.0.0", # Required for distutils compatibility in Python 3.12+
+  # Web application (Flask)
+  "flask>=3.0.0",
+  "flask-sqlalchemy>=3.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0.0",
+  "pytest-cov>=4.1.0",
+  "black>=24.0.0",
+  "ruff>=0.3.0",
+  "mypy>=1.8.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/sasadangelo/finance"
+Issues = "https://github.com/sasadangelo/finance/issues"
+Repository = "https://github.com/sasadangelo/finance"
+
+[dependency-groups]
+dev = [
+  "pytest>=8.0.0",
+  "pytest-cov>=4.1.0",
+  "black>=24.0.0",
+  "ruff>=0.3.0",
+]
+
+[tool.black]
+line-length = 120
+target-version = ["py312", "py313"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+ignore = [
+  "E501", # line too long (handled by black)
+  "B008", # do not perform function calls in argument defaults
+]
+select = [
+  "E", # pycodestyle errors
+  "W", # pycodestyle warnings
+  "F", # pyflakes
+  "I", # isort
+  "B", # flake8-bugbear
+  "C4", # flake8-comprehensions
+]
+
+[tool.pytest.ini_options]
+addopts = "-v --cov=. --cov-report=term-missing"
+python_classes = ["Test*"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+testpaths = ["tests"]
