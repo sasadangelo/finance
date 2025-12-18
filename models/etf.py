@@ -6,50 +6,53 @@ from database import db
 
 
 class Etf(db.Model):
-    """ETF Model - rappresenta un ETF nel database"""
+    """ETF Model - represents an ETF in the database"""
 
     __tablename__ = "etfs"
 
+    # Required fields (NOT NULL)
     ticker = db.Column(db.String(10), primary_key=True)
     name = db.Column(db.String(50), nullable=False)
-    isin = db.Column(db.String(15))
-    launchDate = db.Column(db.String(20))
+    isin = db.Column(db.String(15), nullable=False)
+    launchDate = db.Column(db.String(20), nullable=False)
+    currency = db.Column(db.String(10), nullable=False)
+    dividendType = db.Column(db.String(20), nullable=False)
+
+    # Optional fields (can be NULL)
+    dividendFrequency = db.Column(db.Integer)
+    yeld = db.Column(db.Float)
     capital = db.Column(db.Float)
     replication = db.Column(db.String(30))
     volatility = db.Column(db.Float)
-    currency = db.Column(db.String(10))
-    dividend = db.Column(db.String(20))
-    dividendFrequency = db.Column(db.Integer)
-    yeld = db.Column(db.Float)
 
     def __init__(
         self,
-        ticker,
-        name,
-        isin=None,
-        launchDate=None,
-        capital=None,
-        replication=None,
-        volatility=None,
-        currency=None,
-        dividend=None,
-        dividendFrequency=None,
-        yeld=None,
+        ticker: str,
+        name: str,
+        isin: str,
+        launchDate: str,
+        currency: str,
+        dividendType: str,
+        dividendFrequency: int | None = None,
+        yeld: float | None = None,
+        capital: float | None = None,
+        replication: str | None = None,
+        volatility: float | None = None,
     ):
         self.ticker = ticker
         self.name = name
         self.isin = isin
         self.launchDate = launchDate
+        self.currency = currency
+        self.dividendType = dividendType
+        self.dividendFrequency = dividendFrequency
+        self.yeld = yeld
         self.capital = capital
         self.replication = replication
         self.volatility = volatility
-        self.currency = currency
-        self.dividend = dividend
-        self.dividendFrequency = dividendFrequency
-        self.yeld = yeld
 
     def to_dict(self):
-        """Converte l'oggetto ETF in un dizionario"""
+        """Convert ETF object to dictionary"""
         return {
             "ticker": self.ticker,
             "name": self.name,
@@ -59,7 +62,7 @@ class Etf(db.Model):
             "replication": self.replication,
             "volatility": self.volatility,
             "currency": self.currency,
-            "dividend": self.dividend,
+            "dividendType": self.dividendType,
             "dividendFrequency": self.dividendFrequency,
             "yeld": self.yeld,
         }

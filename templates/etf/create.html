@@ -32,15 +32,15 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="isin">ISIN</label>
-                                    <input type="text" class="form-control" id="isin" name="isin" maxlength="15"
-                                        placeholder="es. IE00B3XXRP09">
+                                    <label for="isin">ISIN *</label>
+                                    <input type="text" class="form-control" id="isin" name="isin" required
+                                        maxlength="15" placeholder="es. IE00B3XXRP09">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="launchDate">Data Lancio</label>
-                                    <input type="text" class="form-control" id="launchDate" name="launchDate"
+                                    <label for="launchDate">Data Lancio *</label>
+                                    <input type="text" class="form-control" id="launchDate" name="launchDate" required
                                         maxlength="20" placeholder="es. 22 maggio 2012">
                                 </div>
                             </div>
@@ -73,9 +73,9 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="currency">Valuta</label>
-                                    <input type="text" class="form-control" id="currency" name="currency" maxlength="10"
-                                        placeholder="es. USD">
+                                    <label for="currency">Valuta *</label>
+                                    <input type="text" class="form-control" id="currency" name="currency" required
+                                        maxlength="10" placeholder="es. USD">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -90,8 +90,8 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="dividend">Dividendo</label>
-                                    <select class="form-control" id="dividend" name="dividend">
+                                    <label for="dividendType">Tipo Dividendo *</label>
+                                    <select class="form-control" id="dividendType" name="dividendType" required>
                                         <option value="">Seleziona...</option>
                                         <option value="Distribuzione">Distribuzione</option>
                                         <option value="Accumulazione">Accumulazione</option>

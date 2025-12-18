@@ -8,25 +8,25 @@ from dto.etf import ETF
 
 
 class EtfService:
-    """Service layer per la gestione degli ETF"""
+    """Service layer for ETF management"""
 
     @staticmethod
     def get_all_etfs():
-        """Recupera tutti gli ETF dal database"""
+        """Retrieve all ETFs from database"""
         return Etf.query.all()
 
     @staticmethod
     def get_etf_by_ticker(ticker):
-        """Recupera un ETF specifico tramite ticker"""
+        """Retrieve a specific ETF by ticker"""
         return Etf.query.get(ticker)
 
     @staticmethod
     def create_etf(etf_dto: ETF):
         """
-        Crea un nuovo ETF
+        Create a new ETF
 
         Args:
-            etf_dto: ETF DTO con i dati validati
+            etf_dto: ETF DTO with validated data
 
         Returns:
             tuple: (etf_model, error_message)
@@ -42,7 +42,7 @@ class EtfService:
                 replication=etf_dto.replication,
                 volatility=etf_dto.volatility,
                 currency=etf_dto.currency,
-                dividend=etf_dto.dividend,
+                dividendType=etf_dto.dividendType,
                 dividendFrequency=etf_dto.dividendFrequency,
                 yeld=etf_dto.yeld,
             )
@@ -56,11 +56,11 @@ class EtfService:
     @staticmethod
     def update_etf(ticker, etf_dto: ETF):
         """
-        Aggiorna un ETF esistente
+        Update an existing ETF
 
         Args:
-            ticker: Ticker dell'ETF da aggiornare
-            etf_dto: ETF DTO con i nuovi dati validati
+            ticker: Ticker of the ETF to update
+            etf_dto: ETF DTO with new validated data
 
         Returns:
             tuple: (etf_model, error_message)
@@ -68,7 +68,7 @@ class EtfService:
         try:
             etf = Etf.query.get(ticker)
             if not etf:
-                return None, "ETF non trovato"
+                return None, "ETF not found"
 
             # Update all fields from DTO
             etf.name = etf_dto.name
@@ -78,7 +78,7 @@ class EtfService:
             etf.replication = etf_dto.replication
             etf.volatility = etf_dto.volatility
             etf.currency = etf_dto.currency
-            etf.dividend = etf_dto.dividend
+            etf.dividendType = etf_dto.dividendType
             etf.dividendFrequency = etf_dto.dividendFrequency
             etf.yeld = etf_dto.yeld
 
@@ -90,7 +90,7 @@ class EtfService:
 
     @staticmethod
     def delete_etf(ticker):
-        """Elimina un ETF"""
+        """Delete an ETF"""
         try:
             etf = Etf.query.get(ticker)
             if not etf:
@@ -105,7 +105,7 @@ class EtfService:
 
     @staticmethod
     def etf_exists(ticker):
-        """Verifica se un ETF esiste"""
+        """Check if an ETF exists"""
         return Etf.query.get(ticker) is not None
 
 

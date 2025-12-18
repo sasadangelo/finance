@@ -9,22 +9,22 @@ from pydantic import ValidationError
 
 
 class EtfController:
-    """Controller per la gestione delle route degli ETF"""
+    """Controller for managing ETF routes"""
 
     @staticmethod
     def index():
-        """Mostra la lista di tutti gli ETF"""
+        """Display list of all ETFs"""
         etfs = EtfService.get_all_etfs()
         return render_template("etf/index.html", etfs=etfs)
 
     @staticmethod
     def create():
-        """Mostra il form per creare un nuovo ETF"""
+        """Display form to create a new ETF"""
         return render_template("etf/create.html")
 
     @staticmethod
     def store():
-        """Salva un nuovo ETF nel database"""
+        """Save a new ETF to database"""
         try:
             # Create DTO from form data with validation
             etf_dto = ETF(
@@ -36,7 +36,7 @@ class EtfController:
                 replication=request.form.get("replication") or None,
                 volatility=float(request.form.get("volatility")) if request.form.get("volatility") else None,
                 currency=request.form.get("currency") or None,
-                dividend=request.form.get("dividend") or None,
+                dividendType=request.form.get("dividendType") or None,
                 dividendFrequency=(
                     int(request.form.get("dividendFrequency")) if request.form.get("dividendFrequency") else None
                 ),
@@ -61,7 +61,7 @@ class EtfController:
 
     @staticmethod
     def edit(ticker):
-        """Mostra il form per modificare un ETF"""
+        """Display form to edit an ETF"""
         etf = EtfService.get_etf_by_ticker(ticker)
         if not etf:
             flash("ETF non trovato", "danger")
@@ -70,7 +70,7 @@ class EtfController:
 
     @staticmethod
     def update(ticker):
-        """Aggiorna un ETF esistente"""
+        """Update an existing ETF"""
         try:
             # Create DTO from form data with validation
             etf_dto = ETF(
@@ -82,7 +82,7 @@ class EtfController:
                 replication=request.form.get("replication") or None,
                 volatility=float(request.form.get("volatility")) if request.form.get("volatility") else None,
                 currency=request.form.get("currency") or None,
-                dividend=request.form.get("dividend") or None,
+                dividendType=request.form.get("dividendType") or None,
                 dividendFrequency=(
                     int(request.form.get("dividendFrequency")) if request.form.get("dividendFrequency") else None
                 ),
@@ -106,7 +106,7 @@ class EtfController:
 
     @staticmethod
     def delete(ticker):
-        """Elimina un ETF"""
+        """Delete an ETF"""
         success, error = EtfService.delete_etf(ticker)
         if error:
             flash(f"Errore nell'eliminazione dell'ETF: {error}", "danger")
@@ -117,7 +117,7 @@ class EtfController:
 
     @staticmethod
     def show(ticker):
-        """Mostra i dettagli di un ETF"""
+        """Display ETF details"""
         etf = EtfService.get_etf_by_ticker(ticker)
         if not etf:
             flash(f"ETF {ticker} non trovato!", "danger")
@@ -127,7 +127,7 @@ class EtfController:
 
     @staticmethod
     def get_quotes(ticker):
-        """Restituisce i dati delle quotazioni in formato JSON per Chart.js"""
+        """Return quote data in JSON format for Chart.js"""
         from flask import jsonify, request
         import sqlite3 as db
         import datetime as dt

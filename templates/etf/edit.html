@@ -33,15 +33,15 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="isin">ISIN</label>
-                                    <input type="text" class="form-control" id="isin" name="isin" maxlength="15"
-                                        value="{{ etf.isin or '' }}">
+                                    <label for="isin">ISIN *</label>
+                                    <input type="text" class="form-control" id="isin" name="isin" required
+                                        maxlength="15" value="{{ etf.isin or '' }}">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="launchDate">Data Lancio</label>
-                                    <input type="text" class="form-control" id="launchDate" name="launchDate"
+                                    <label for="launchDate">Data Lancio *</label>
+                                    <input type="text" class="form-control" id="launchDate" name="launchDate" required
                                         maxlength="20" value="{{ etf.launchDate or '' }}">
                                 </div>
                             </div>
@@ -74,9 +74,9 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="currency">Valuta</label>
-                                    <input type="text" class="form-control" id="currency" name="currency" maxlength="10"
-                                        value="{{ etf.currency or '' }}">
+                                    <label for="currency">Valuta *</label>
+                                    <input type="text" class="form-control" id="currency" name="currency" required
+                                        maxlength="10" value="{{ etf.currency or '' }}">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -91,13 +91,13 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="dividend">Dividendo</label>
-                                    <select class="form-control" id="dividend" name="dividend">
+                                    <label for="dividendType">Tipo Dividendo *</label>
+                                    <select class="form-control" id="dividendType" name="dividendType" required>
                                         <option value="">Seleziona...</option>
-                                        <option value="Distribuzione" {% if etf.dividend=='Distribuzione' %}selected{%
-                                            endif %}>Distribuzione</option>
-                                        <option value="Accumulazione" {% if etf.dividend=='Accumulazione' %}selected{%
-                                            endif %}>Accumulazione</option>
+                                        <option value="Distribuzione" {% if etf.dividendType=='Distribuzione'
+                                            %}selected{% endif %}>Distribuzione</option>
+                                        <option value="Accumulazione" {% if etf.dividendType=='Accumulazione'
+                                            %}selected{% endif %}>Accumulazione</option>
                                     </select>
                                 </div>
                             </div>
