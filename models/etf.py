@@ -5,7 +5,7 @@
 from database import db
 
 
-class Etf(db.Model):
+class EtfDAO(db.Model):
     """ETF Model - represents an ETF in the database"""
 
     __tablename__ = "etfs"
@@ -25,50 +25,5 @@ class Etf(db.Model):
     replication = db.Column(db.String(30))
     volatility = db.Column(db.Float)
 
-    def __init__(
-        self,
-        ticker: str,
-        name: str,
-        isin: str,
-        launchDate: str,
-        currency: str,
-        dividendType: str,
-        dividendFrequency: int | None = None,
-        yeld: float | None = None,
-        capital: float | None = None,
-        replication: str | None = None,
-        volatility: float | None = None,
-    ):
-        self.ticker = ticker
-        self.name = name
-        self.isin = isin
-        self.launchDate = launchDate
-        self.currency = currency
-        self.dividendType = dividendType
-        self.dividendFrequency = dividendFrequency
-        self.yeld = yeld
-        self.capital = capital
-        self.replication = replication
-        self.volatility = volatility
-
-    def to_dict(self):
-        """Convert ETF object to dictionary"""
-        return {
-            "ticker": self.ticker,
-            "name": self.name,
-            "isin": self.isin,
-            "launchDate": self.launchDate,
-            "capital": self.capital,
-            "replication": self.replication,
-            "volatility": self.volatility,
-            "currency": self.currency,
-            "dividendType": self.dividendType,
-            "dividendFrequency": self.dividendFrequency,
-            "yeld": self.yeld,
-        }
-
     def __repr__(self):
-        return f"<ETF {self.ticker}: {self.name}>"
-
-
-# Made with Bob
+        return f"<EtfDAO {self.ticker}: {self.name}>"

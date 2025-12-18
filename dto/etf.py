@@ -45,6 +45,3 @@ class ETF(BaseModel):
     class Config:
         str_strip_whitespace = True
         from_attributes = True  # Allows creation from ORM models
-
-
-# Made with Bob

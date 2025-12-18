@@ -3,8 +3,8 @@
 # Licensed under the MIT License. See LICENSE.md for details.
 # -----------------------------------------------------------------------------
 from flask import render_template, request, redirect, url_for, flash
-from services.etf_service import EtfService
-from dto.etf import ETF
+from services import EtfService
+from dto import ETF
 from pydantic import ValidationError
 
 
@@ -129,48 +129,22 @@ class EtfController:
     def get_quotes(ticker):
         """Return quote data in JSON format for Chart.js"""
         from flask import jsonify, request
-        import sqlite3 as db
-        import datetime as dt
-        from dateutil.relativedelta import relativedelta
 
         # Get period from query parameter (default 1Y)
         period = request.args.get("period", "1Y")
 
-        # Calculate start date
-        period_map = {
-            "Max": dt.datetime(1970, 1, 1),
-            "5Y": dt.datetime.now() - relativedelta(years=5),
-            "1Y": dt.datetime.now() - relativedelta(years=1),
-            "YTD": dt.datetime(dt.datetime.now().year, 1, 1),
-            "6M": dt.datetime.now() - relativedelta(months=6),
-            "3M": dt.datetime.now() - relativedelta(months=3),
-            "1M": dt.datetime.now() - relativedelta(months=1),
-            "5D": dt.datetime.now() - relativedelta(days=5),
-        }
-        start_date = period_map.get(period, dt.datetime.now() - relativedelta(years=1))
-
         try:
-            cnx = db.connect("database/etfs.db")
-            cur = cnx.cursor()
+            # Use service layer to get quotes
+            quotes = EtfService.get_quotes(ticker, period)
 
-            # Get quotes
-            cur.execute(
-                "SELECT Date, Close FROM quotes WHERE Ticker=? AND Date > ? ORDER BY Date", [ticker, start_date]
-            )
-            rows = cur.fetchall()
-            cnx.close()
-
-            if not rows:
+            if not quotes:
                 return jsonify({"error": "No quotes available"}), 404
 
             # Format data for Chart.js
-            dates = [row[0] for row in rows]
-            prices = [float(row[1]) for row in rows]
+            dates = [quote.date for quote in quotes]
+            prices = [float(quote.close) for quote in quotes]
 
             return jsonify({"labels": dates, "data": prices, "ticker": ticker})
 
         except Exception as e:
             return jsonify({"error": str(e)}), 500
-
-
-# Made with Bob
