@@ -1,5 +1,7 @@
-from flask import render_template, request, redirect, url_for, flash, jsonify
+from flask import render_template, request, redirect, url_for, flash
 from services.etf_service import EtfService
+from dto.etf import ETF
+from pydantic import ValidationError
 
 
 class EtfController:
@@ -19,27 +21,37 @@ class EtfController:
     @staticmethod
     def store():
         """Salva un nuovo ETF nel database"""
-        data = {
-            "ticker": request.form.get("ticker"),
-            "name": request.form.get("name"),
-            "isin": request.form.get("isin"),
-            "launchDate": request.form.get("launchDate"),
-            "capital": float(request.form.get("capital")) if request.form.get("capital") else None,
-            "replication": request.form.get("replication"),
-            "volatility": float(request.form.get("volatility")) if request.form.get("volatility") else None,
-            "currency": request.form.get("currency"),
-            "dividend": request.form.get("dividend"),
-            "dividendFrequency": (
-                int(request.form.get("dividendFrequency")) if request.form.get("dividendFrequency") else None
-            ),
-            "yeld": float(request.form.get("yeld")) if request.form.get("yeld") else None,
-        }
+        try:
+            # Create DTO from form data with validation
+            etf_dto = ETF(
+                ticker=request.form.get("ticker"),
+                name=request.form.get("name"),
+                isin=request.form.get("isin") or None,
+                launchDate=request.form.get("launchDate") or None,
+                capital=float(request.form.get("capital")) if request.form.get("capital") else None,
+                replication=request.form.get("replication") or None,
+                volatility=float(request.form.get("volatility")) if request.form.get("volatility") else None,
+                currency=request.form.get("currency") or None,
+                dividend=request.form.get("dividend") or None,
+                dividendFrequency=(
+                    int(request.form.get("dividendFrequency")) if request.form.get("dividendFrequency") else None
+                ),
+                yeld=float(request.form.get("yeld")) if request.form.get("yeld") else None,
+            )
 
-        etf, error = EtfService.create_etf(data)
-        if error:
-            flash(f"Errore nella creazione dell'ETF: {error}", "danger")
-        else:
-            flash(f"ETF {etf.ticker} creato con successo!", "success")
+            # Pass DTO to service
+            etf, error = EtfService.create_etf(etf_dto)
+            if error:
+                flash(f"Errore nella creazione dell'ETF: {error}", "danger")
+            else:
+                flash(f"ETF {etf.ticker} creato con successo!", "success")
+
+        except ValidationError as e:
+            # Handle validation errors
+            errors = "; ".join([f"{err['loc'][0]}: {err['msg']}" for err in e.errors()])
+            flash(f"Errori di validazione: {errors}", "danger")
+        except ValueError as e:
+            flash(f"Errore nei dati: {str(e)}", "danger")
 
         return redirect(url_for("etf.index"))
 
@@ -55,26 +67,36 @@ class EtfController:
     @staticmethod
     def update(ticker):
         """Aggiorna un ETF esistente"""
-        data = {
-            "name": request.form.get("name"),
-            "isin": request.form.get("isin"),
-            "launchDate": request.form.get("launchDate"),
-            "capital": float(request.form.get("capital")) if request.form.get("capital") else None,
-            "replication": request.form.get("replication"),
-            "volatility": float(request.form.get("volatility")) if request.form.get("volatility") else None,
-            "currency": request.form.get("currency"),
-            "dividend": request.form.get("dividend"),
-            "dividendFrequency": (
-                int(request.form.get("dividendFrequency")) if request.form.get("dividendFrequency") else None
-            ),
-            "yeld": float(request.form.get("yeld")) if request.form.get("yeld") else None,
-        }
+        try:
+            # Create DTO from form data with validation
+            etf_dto = ETF(
+                ticker=ticker,  # Keep existing ticker
+                name=request.form.get("name"),
+                isin=request.form.get("isin") or None,
+                launchDate=request.form.get("launchDate") or None,
+                capital=float(request.form.get("capital")) if request.form.get("capital") else None,
+                replication=request.form.get("replication") or None,
+                volatility=float(request.form.get("volatility")) if request.form.get("volatility") else None,
+                currency=request.form.get("currency") or None,
+                dividend=request.form.get("dividend") or None,
+                dividendFrequency=(
+                    int(request.form.get("dividendFrequency")) if request.form.get("dividendFrequency") else None
+                ),
+                yeld=float(request.form.get("yeld")) if request.form.get("yeld") else None,
+            )
 
-        etf, error = EtfService.update_etf(ticker, data)
-        if error:
-            flash(f"Errore nell'aggiornamento dell'ETF: {error}", "danger")
-        else:
-            flash(f"ETF {ticker} aggiornato con successo!", "success")
+            # Pass DTO to service
+            etf, error = EtfService.update_etf(ticker, etf_dto)
+            if error:
+                flash(f"Errore nell'aggiornamento dell'ETF: {error}", "danger")
+            else:
+                flash(f"ETF {ticker} aggiornato con successo!", "success")
+
+        except ValidationError as e:
+            errors = "; ".join([f"{err['loc'][0]}: {err['msg']}" for err in e.errors()])
+            flash(f"Errori di validazione: {errors}", "danger")
+        except ValueError as e:
+            flash(f"Errore nei dati: {str(e)}", "danger")
 
         return redirect(url_for("etf.index"))
 

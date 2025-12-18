@@ -31,6 +31,7 @@ dependencies = [
   # Web application (Flask)
   "flask>=3.0.0",
   "flask-sqlalchemy>=3.1.0",
+  "pydantic>=2.12.5",
 ]
 
 [project.optional-dependencies]

@@ -1,5 +1,6 @@
 from models.etf import Etf
 from database import db
+from dto.etf import ETF
 
 
 class EtfService:
@@ -16,21 +17,30 @@ class EtfService:
         return Etf.query.get(ticker)
 
     @staticmethod
-    def create_etf(data):
-        """Crea un nuovo ETF"""
+    def create_etf(etf_dto: ETF):
+        """
+        Crea un nuovo ETF
+
+        Args:
+            etf_dto: ETF DTO con i dati validati
+
+        Returns:
+            tuple: (etf_model, error_message)
+        """
         try:
+            # Create model from DTO
             etf = Etf(
-                ticker=data.get("ticker"),
-                name=data.get("name"),
-                isin=data.get("isin"),
-                launchDate=data.get("launchDate"),
-                capital=data.get("capital"),
-                replication=data.get("replication"),
-                volatility=data.get("volatility"),
-                currency=data.get("currency"),
-                dividend=data.get("dividend"),
-                dividendFrequency=data.get("dividendFrequency"),
-                yeld=data.get("yeld"),
+                ticker=etf_dto.ticker,
+                name=etf_dto.name,
+                isin=etf_dto.isin,
+                launchDate=etf_dto.launchDate,
+                capital=etf_dto.capital,
+                replication=etf_dto.replication,
+                volatility=etf_dto.volatility,
+                currency=etf_dto.currency,
+                dividend=etf_dto.dividend,
+                dividendFrequency=etf_dto.dividendFrequency,
+                yeld=etf_dto.yeld,
             )
             db.session.add(etf)
             db.session.commit()
@@ -40,34 +50,33 @@ class EtfService:
             return None, str(e)
 
     @staticmethod
-    def update_etf(ticker, data):
-        """Aggiorna un ETF esistente"""
+    def update_etf(ticker, etf_dto: ETF):
+        """
+        Aggiorna un ETF esistente
+
+        Args:
+            ticker: Ticker dell'ETF da aggiornare
+            etf_dto: ETF DTO con i nuovi dati validati
+
+        Returns:
+            tuple: (etf_model, error_message)
+        """
         try:
             etf = Etf.query.get(ticker)
             if not etf:
                 return None, "ETF non trovato"
 
-            # Aggiorna solo i campi forniti
-            if "name" in data:
-                etf.name = data["name"]
-            if "isin" in data:
-                etf.isin = data["isin"]
-            if "launchDate" in data:
-                etf.launchDate = data["launchDate"]
-            if "capital" in data:
-                etf.capital = data["capital"]
-            if "replication" in data:
-                etf.replication = data["replication"]
-            if "volatility" in data:
-                etf.volatility = data["volatility"]
-            if "currency" in data:
-                etf.currency = data["currency"]
-            if "dividend" in data:
-                etf.dividend = data["dividend"]
-            if "dividendFrequency" in data:
-                etf.dividendFrequency = data["dividendFrequency"]
-            if "yeld" in data:
-                etf.yeld = data["yeld"]
+            # Update all fields from DTO
+            etf.name = etf_dto.name
+            etf.isin = etf_dto.isin
+            etf.launchDate = etf_dto.launchDate
+            etf.capital = etf_dto.capital
+            etf.replication = etf_dto.replication
+            etf.volatility = etf_dto.volatility
+            etf.currency = etf_dto.currency
+            etf.dividend = etf_dto.dividend
+            etf.dividendFrequency = etf_dto.dividendFrequency
+            etf.yeld = etf_dto.yeld
 
             db.session.commit()
             return etf, None
