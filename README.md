@@ -1,57 +1,147 @@
-# ETF Finance
+# ETF Manager - Flask Application
 
-This is an ongoing project I am working on to monitor ETF performance. Currently my database contains only few ETFs on Italian market. 
+Flask web application for managing an ETF portfolio with complete CRUD functionality.
 
-Currently, you have a set of very simple python script where each one has a very small goal:
-* **download.py**: download quotes for ETF listed in the CSV file database/ETF.csv.
-* **update_quotes.py**: update quotes for ETF listed in the CSV file database/ETF.csv.
-* **graph.py**: create the chart for a given ETF for a given period of time. Mobile average can be drawn too.
-* **perf.py**: calculate return and risk for one or more ETF for a given period of time.
-
-# How to use
-
-Here the command to download the project and run it:
+## Project Structure
 
 ```
-git clone https://github.com/sasadangelo/finance
-cd finance
-pip3 install pandas --user
-pip3 install pandas_datareader --user
-pip3 install yfinance --user
-pip3 install matplotlib --user
-pip3 install tabulate --user
+finance/
+├── app.py                      # Main Flask application
+├── database.py                 # SQLAlchemy database configuration
+├── models/                     # Database models (DAO)
+│   ├── __init__.py
+│   └── etf.py                 # ETF model
+├── services/                   # Business logic layer
+│   ├── __init__.py
+│   └── etf_service.py         # ETF management services
+├── controllers/                # Controllers for routes
+│   ├── __init__.py
+│   └── etf_controller.py      # ETF controller
+├── routes/                     # Route definitions
+│   └── etf_routes.py          # ETF routes
+├── templates/                  # HTML templates
+│   ├── base.html              # Base template
+│   └── etf/
+│       ├── index.html         # ETF list
+│       ├── create.html        # Create ETF form
+│       ├── edit.html          # Edit ETF form
+│       └── show.html          # ETF details
+└── static/                     # Static files (CSS, JS)
+    ├── css/
+    └── js/
 ```
 
-The project include the file database/ETF.csv where you should insert the ETF you are interested in. The project already has the quotes for ETF listed in database/ETF.csv file but if you insert a new ETF you need to download its quotes with the following command:
+## Architecture
 
+The application follows the **MVC (Model-View-Controller)** pattern with a service layer:
+
+1. **Models** (`models/`): Define data structure and interact with the database
+2. **Services** (`services/`): Contain business logic and CRUD operations
+3. **Controllers** (`controllers/`): Handle HTTP requests and coordinate models and views
+4. **Routes** (`routes/`): Define application endpoints
+5. **Templates** (`templates/`): HTML views with Jinja2
+
+## CRUD Functionality
+
+### List ETFs
+- **URL**: `/` or `/etfs`
+- **Method**: GET
+- **Description**: Display all ETFs in the database
+
+### Create ETF
+- **URL**: `/etfs/create`
+- **Method**: GET
+- **Description**: Show form to create a new ETF
+
+### Store ETF
+- **URL**: `/etfs/store`
+- **Method**: POST
+- **Description**: Save a new ETF to the database
+
+### Show ETF
+- **URL**: `/etfs/<ticker>`
+- **Method**: GET
+- **Description**: Display details of a specific ETF
+
+### Edit ETF
+- **URL**: `/etfs/<ticker>/edit`
+- **Method**: GET
+- **Description**: Show form to edit an ETF
+
+### Update ETF
+- **URL**: `/etfs/<ticker>/update`
+- **Method**: POST
+- **Description**: Update an existing ETF
+
+### Delete ETF
+- **URL**: `/etfs/<ticker>/delete`
+- **Method**: POST
+- **Description**: Delete an ETF from the database
+
+## Getting Started
+
+### Prerequisites
+- Python 3.12+
+- UV package manager
+
+### Installation
+```bash
+# Install dependencies
+uv sync
 ```
-python3 download.py <ticker>
+
+### Running the Application
+```bash
+# Start the Flask application
+uv run python app.py
 ```
 
-You can update quotes for all the ETF in database/ETF.csv with the following command:
+The application will be available at: http://127.0.0.1:5001
 
-```
-./update_quotes.sh
-```
-
-Once you have all ETF with all quotes downloaded in database/quotes/\*.csv you can import them in the database **databse/etfs.db** with the following command:
-
-```
-python3 import.py
+### Alternative: Using Flask CLI
+```bash
+# Alternative using Flask CLI
+uv run flask run --port 5001
 ```
 
-You can view the chart for a single ETF using the following command:
+## ETF Data Model
 
+```python
+class Etf:
+    ticker: str              # ETF ticker (primary key)
+    name: str               # ETF name
+    isin: str               # ISIN code
+    launchDate: str         # Launch date
+    capital: float          # Capital in millions
+    replication: str        # Replication type
+    volatility: float       # Volatility percentage
+    currency: str           # Currency
+    dividend: str           # Dividend type (Distribution/Accumulation)
+    dividendFrequency: int  # Dividend frequency (1=Annual, 2=Semi-annual, 4=Quarterly, 12=Monthly)
+    yeld: float            # Yield percentage
 ```
-python3 graph.py [-p {Max,5Y,1Y,YTD,6M,3M,1M,5D}] [-m {5,10,20,50,100,200}] <ticker>
-```
 
-By default the python script draw the chart for the Max period but you can specify the period with the -p option. You can decide to draw the mobile average usng the -m option.
+## Technologies Used
 
-Finally, you can see performance (risk/return) of a single or multiple ETFs in terms of compound return, annual return and volatily with the command:
+- **Flask**: Python web framework
+- **SQLAlchemy**: ORM for database
+- **SQLite**: Database
+- **Bootstrap 5**: CSS framework
+- **Font Awesome**: Icons
+- **Jinja2**: Template engine
 
-```
-perf.py [-s STARTDATE] [-e ENDDATE] ticker [ticker ...]
-```
+## Development Notes
 
-the option -s and -e allow you to specify the period of time.
+- Port 5000 might be occupied by AirPlay Receiver on macOS, so the app uses port 5001
+- SQLite database is located at `database/etfs.db`
+- Flash messages are used for user feedback
+- All forms include client-side and server-side validation
+
+## Future Enhancements
+
+- [ ] User authentication
+- [ ] REST API for external integration
+- [ ] Export data to CSV/Excel
+- [ ] Charts and statistics
+- [ ] Integration with automatic quote download
+- [ ] Dashboard with portfolio metrics

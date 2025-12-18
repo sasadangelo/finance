@@ -1,6 +1,6 @@
 import os
-from database import db
 from flask import Flask
+from database import db
 
 # SqlAlchemy Database Configuration With SqlLite
 project_dir = os.path.dirname(os.path.abspath(__file__))
@@ -14,9 +14,11 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 # Initialize db with app
 db.init_app(app)
 
-# Import routes after app and db initialization
+# Import and register blueprints
 with app.app_context():
-    import etfs_routes
+    from routes.etf_routes import etf_bp
+
+    app.register_blueprint(etf_bp)
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(debug=True, host="0.0.0.0", port=5001)

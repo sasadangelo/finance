@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}Aggiungi ETF{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h2 class="mb-0">Aggiungi Nuovo ETF</h2>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('etf.store') }}" method="POST">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="ticker">Ticker *</label>
+                                    <input type="text" class="form-control" id="ticker" name="ticker" required
+                                        maxlength="10" placeholder="es. VUSA.MI">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="name">Nome *</label>
+                                    <input type="text" class="form-control" id="name" name="name" required
+                                        maxlength="50" placeholder="es. Vanguard S&P 500">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="isin">ISIN</label>
+                                    <input type="text" class="form-control" id="isin" name="isin" maxlength="15"
+                                        placeholder="es. IE00B3XXRP09">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="launchDate">Data Lancio</label>
+                                    <input type="text" class="form-control" id="launchDate" name="launchDate"
+                                        maxlength="20" placeholder="es. 22 maggio 2012">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="capital">Capitale (M)</label>
+                                    <input type="number" step="0.01" class="form-control" id="capital" name="capital"
+                                        placeholder="es. 21249">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="volatility">Volatilità (%)</label>
+                                    <input type="number" step="0.01" class="form-control" id="volatility"
+                                        name="volatility" placeholder="es. 16.71">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="yeld">Rendimento (%)</label>
+                                    <input type="number" step="0.01" class="form-control" id="yeld" name="yeld"
+                                        placeholder="es. 1.5">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="currency">Valuta</label>
+                                    <input type="text" class="form-control" id="currency" name="currency" maxlength="10"
+                                        placeholder="es. USD">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="replication">Replica</label>
+                                    <input type="text" class="form-control" id="replication" name="replication"
+                                        maxlength="30" placeholder="es. Fisica (Replica totale)">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="dividend">Dividendo</label>
+                                    <select class="form-control" id="dividend" name="dividend">
+                                        <option value="">Seleziona...</option>
+                                        <option value="Distribuzione">Distribuzione</option>
+                                        <option value="Accumulazione">Accumulazione</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="dividendFrequency">Frequenza Dividendo</label>
+                                    <select class="form-control" id="dividendFrequency" name="dividendFrequency">
+                                        <option value="">Seleziona...</option>
+                                        <option value="1">Annuale</option>
+                                        <option value="2">Semestrale</option>
+                                        <option value="4">Trimestrale</option>
+                                        <option value="12">Mensile</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mt-4">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Salva ETF
+                            </button>
+                            <a href="{{ url_for('etf.index') }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Annulla
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
