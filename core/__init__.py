@@ -1,0 +1,12 @@
+# -----------------------------------------------------------------------------
+# Copyright (c) 2025 Salvatore D'Angelo, Code4Projects
+# Licensed under the MIT License. See LICENSE.md for details.
+# -----------------------------------------------------------------------------
+"""
+Core infrastructure package.
+Contains database management, configuration, and logging utilities.
+"""
+from .database import db, DatabaseManager
+from .types import ApplicationContainer
+
+__all__ = ["db", "DatabaseManager", "ApplicationContainer"]

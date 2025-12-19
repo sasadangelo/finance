@@ -4,7 +4,8 @@
 # -----------------------------------------------------------------------------
 import os
 from flask import Flask
-from database import db
+from core.database import db
+from bootstrap import init_app
 
 # SqlAlchemy Database Configuration With SqlLite
 project_dir = os.path.dirname(os.path.abspath(__file__))
@@ -17,6 +18,9 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Initialize db with app
 db.init_app(app)
+
+# Initialize application (services and controllers)
+init_app(app, db)
 
 # Import and register blueprints
 with app.app_context():
