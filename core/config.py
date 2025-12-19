@@ -8,6 +8,7 @@ Loads configuration from config.yml and environment variables.
 """
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
+from typing import Optional
 import yaml
 from pathlib import Path
 from functools import lru_cache
@@ -52,6 +53,19 @@ class AppConfig(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="", case_sensitive=False)
 
 
+class LogConfig(BaseSettings):
+    """Logging configuration"""
+
+    level: str = Field(default="INFO", description="Log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)")
+    console: bool = Field(default=True, description="Enable console logging")
+    file: Optional[str] = Field(default=None, description="Log file path (None to disable)")
+    rotation: str = Field(default="10 MB", description="Log rotation size")
+    retention: str = Field(default="7 days", description="Log retention period")
+    compression: str = Field(default="zip", description="Compression format for rotated logs")
+
+    model_config = SettingsConfigDict(env_prefix="LOG_", case_sensitive=False)
+
+
 class Settings(BaseSettings):
     """
     Main application settings.
@@ -62,6 +76,7 @@ class Settings(BaseSettings):
 
     app: AppConfig
     database: DatabaseConfig
+    log: LogConfig
 
     @classmethod
     def from_yaml_and_env(cls, config_path: str | Path = "config.yml") -> "Settings":
@@ -85,6 +100,7 @@ class Settings(BaseSettings):
         # Create configs with env override
         app_data = config_data.get("app", {})
         db_data = config_data.get("database", {})
+        log_data = config_data.get("log", {})
 
         # Environment variables override YAML
         # SECRET_KEY must come from environment
@@ -104,7 +120,14 @@ class Settings(BaseSettings):
             os.getenv("DATABASE_TRACK_MODIFICATIONS", str(db_data.get("track_modifications", False))).lower() == "true"
         )
 
-        return cls(app=AppConfig(**app_data), database=DatabaseConfig(**db_data))
+        log_data["level"] = os.getenv("LOG_LEVEL", log_data.get("level", "INFO"))
+        log_data["console"] = os.getenv("LOG_CONSOLE", str(log_data.get("console", True))).lower() == "true"
+        log_data["file"] = os.getenv("LOG_FILE", log_data.get("file"))
+        log_data["rotation"] = os.getenv("LOG_ROTATION", log_data.get("rotation", "10 MB"))
+        log_data["retention"] = os.getenv("LOG_RETENTION", log_data.get("retention", "7 days"))
+        log_data["compression"] = os.getenv("LOG_COMPRESSION", log_data.get("compression", "zip"))
+
+        return cls(app=AppConfig(**app_data), database=DatabaseConfig(**db_data), log=LogConfig(**log_data))
 
 
 @lru_cache

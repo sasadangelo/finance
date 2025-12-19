@@ -11,3 +11,11 @@ app:
 database:
   uri: "database/etfs.db"
   track_modifications: false
+# Logging configuration (all parameters are optional with defaults)
+# log:
+#   level: "INFO"              # Default: INFO (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+#   console: false # Default: true (log to stdout)
+#   file: "logs/etf.log" # Default: null (uncomment to enable file logging)
+#   rotation: "10 MB"          # Default: 10 MB (log rotation size)
+#   retention: "7 days"        # Default: 7 days (log retention period)
+#   compression: "zip"         # Default: zip (compression format for rotated logs)

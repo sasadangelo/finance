@@ -6,6 +6,7 @@ from flask import Flask
 from pathlib import Path
 from core.database import db
 from core.config import get_settings
+from core.log import setup_logging
 from bootstrap import init_app
 from dotenv import load_dotenv
 
@@ -17,6 +18,16 @@ project_dir = Path(__file__).parent
 
 # Load settings (from .env + config.yml)
 settings = get_settings()
+
+# Initialize logging
+setup_logging(
+    level=settings.log.level,
+    console=settings.log.console,
+    file=settings.log.file,
+    rotation=settings.log.rotation,
+    retention=settings.log.retention,
+    compression=settings.log.compression,
+)
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = settings.app.secret_key

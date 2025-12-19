@@ -4,6 +4,7 @@
 # -----------------------------------------------------------------------------
 from models import EtfDAO, QuoteDAO
 from core.database import DatabaseManager
+from core.log import LoggerManager
 from dto import ETF, Quote
 import datetime as dt
 from dateutil.relativedelta import relativedelta
@@ -20,6 +21,8 @@ class EtfService:
             db_manager: DatabaseManager instance for session handling
         """
         self.db_manager = db_manager
+        self.logger = LoggerManager.get_logger(self.__class__.__name__)
+        self.logger.info("EtfService initialized")
 
     def get_all(self) -> list[ETF]:
         """
@@ -28,7 +31,9 @@ class EtfService:
         Returns:
             List of ETF DTOs
         """
+        self.logger.debug("Fetching all ETFs from database")
         etf_daos = EtfDAO.query.all()
+        self.logger.info(f"Retrieved {len(etf_daos)} ETFs from database")
         return [ETF.model_validate(dao) for dao in etf_daos]
 
     def get_by_ticker(self, ticker: str) -> ETF | None:
@@ -41,8 +46,14 @@ class EtfService:
         Returns:
             ETF DTO if found, None otherwise
         """
+        self.logger.debug(f"Fetching ETF with ticker: {ticker}")
         etf_dao = EtfDAO.query.get(ticker)
-        return ETF.model_validate(etf_dao) if etf_dao else None
+        if etf_dao:
+            self.logger.debug(f"ETF {ticker} found in database")
+            return ETF.model_validate(etf_dao)
+        else:
+            self.logger.debug(f"ETF {ticker} not found in database")
+            return None
 
     def create(self, etf_dto: ETF) -> None:
         """
@@ -54,6 +65,7 @@ class EtfService:
         Raises:
             SQLAlchemyError: On database errors
         """
+        self.logger.info(f"Creating new ETF: {etf_dto.ticker}")
         with self.db_manager.get_session() as session:
             etf_dao = EtfDAO()
             etf_dao.ticker = etf_dto.ticker
@@ -68,6 +80,7 @@ class EtfService:
             etf_dao.dividendFrequency = etf_dto.dividendFrequency
             etf_dao.yeld = etf_dto.yeld
             session.add(etf_dao)
+            self.logger.info(f"ETF {etf_dto.ticker} created successfully in database")
 
     def update(self, etf_dto: ETF) -> None:
         """
@@ -80,9 +93,11 @@ class EtfService:
             ValueError: If ETF not found
             SQLAlchemyError: On database errors
         """
+        self.logger.info(f"Updating ETF: {etf_dto.ticker}")
         with self.db_manager.get_session():
             etf_dao = EtfDAO.query.get(etf_dto.ticker)
             if not etf_dao:
+                self.logger.error(f"ETF {etf_dto.ticker} not found for update")
                 raise ValueError(f"ETF {etf_dto.ticker} not found")
 
             # Update all fields from DTO
@@ -96,6 +111,7 @@ class EtfService:
             etf_dao.dividendType = etf_dto.dividendType
             etf_dao.dividendFrequency = etf_dto.dividendFrequency
             etf_dao.yeld = etf_dto.yeld
+            self.logger.info(f"ETF {etf_dto.ticker} updated successfully in database")
 
     def delete(self, ticker: str) -> None:
         """
@@ -108,12 +124,15 @@ class EtfService:
             ValueError: If ETF not found
             SQLAlchemyError: On database errors
         """
+        self.logger.info(f"Deleting ETF: {ticker}")
         with self.db_manager.get_session() as session:
             etf_dao = EtfDAO.query.get(ticker)
             if not etf_dao:
+                self.logger.error(f"ETF {ticker} not found for deletion")
                 raise ValueError(f"ETF {ticker} not found")
 
             session.delete(etf_dao)
+            self.logger.info(f"ETF {ticker} deleted successfully from database")
 
     def exists(self, ticker: str) -> bool:
         """
@@ -125,7 +144,9 @@ class EtfService:
         Returns:
             True if exists, False otherwise
         """
-        return EtfDAO.query.get(ticker) is not None
+        exists = EtfDAO.query.get(ticker) is not None
+        self.logger.debug(f"ETF {ticker} exists: {exists}")
+        return exists
 
     def get_quotes(self, ticker: str, period: str = "1Y") -> list[Quote]:
         """
@@ -138,6 +159,8 @@ class EtfService:
         Returns:
             List of Quote DTOs
         """
+        self.logger.info(f"Fetching quotes for ETF {ticker}, period: {period}")
+
         # Calculate start date based on period
         period_map = {
             "Max": dt.datetime(1970, 1, 1),
@@ -150,6 +173,7 @@ class EtfService:
             "5D": dt.datetime.now() - relativedelta(days=5),
         }
         start_date = period_map.get(period, dt.datetime.now() - relativedelta(years=1))
+        self.logger.debug(f"Calculated start date for period {period}: {start_date.strftime('%Y-%m-%d')}")
 
         # Query quotes from database
         quote_daos = (
@@ -157,6 +181,8 @@ class EtfService:
             .order_by(QuoteDAO.Date)
             .all()
         )
+
+        self.logger.info(f"Retrieved {len(quote_daos)} quotes for ETF {ticker}")
 
         # Convert DAOs to DTOs
         return [

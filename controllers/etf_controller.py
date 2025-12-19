@@ -7,6 +7,7 @@ from dto import ETF
 from pydantic import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 from services import EtfService
+from core.log import LoggerManager
 
 
 class EtfController:
@@ -20,10 +21,14 @@ class EtfController:
             etf_service: EtfService instance for business logic
         """
         self.etf_service = etf_service
+        self.logger = LoggerManager.get_logger(self.__class__.__name__)
+        self.logger.info("EtfController initialized")
 
     def index(self):
         """Display list of all ETFs"""
+        self.logger.info("Fetching all ETFs for index page")
         etfs = self.etf_service.get_all()
+        self.logger.info(f"Retrieved {len(etfs)} ETFs")
         return render_template("etf/index.html", etfs=etfs)
 
     def create(self):
@@ -32,6 +37,9 @@ class EtfController:
 
     def store(self):
         """Save a new ETF to database"""
+        ticker = request.form.get("ticker")
+        self.logger.info(f"Attempting to create new ETF with ticker: {ticker}")
+
         try:
             # Create DTO from form data with validation
             etf_dto = ETF(
@@ -52,34 +60,42 @@ class EtfController:
 
             # Call service - exceptions propagate from context manager
             self.etf_service.create(etf_dto)
+            self.logger.info(f"ETF {etf_dto.ticker} created successfully")
             flash(f"ETF {etf_dto.ticker} creato con successo!", "success")
 
         except ValidationError as e:
             # Handle Pydantic validation errors
             errors = "; ".join([f"{err['loc'][0]}: {err['msg']}" for err in e.errors()])
+            self.logger.warning(f"Validation error creating ETF {ticker}: {errors}")
             flash(f"Errori di validazione: {errors}", "danger")
         except SQLAlchemyError as e:
             # Handle database errors (from context manager)
+            self.logger.error(f"Database error creating ETF {ticker}: {str(e)}")
             flash(f"Errore database: {str(e)}", "danger")
         except ValueError as e:
             # Handle business logic errors
+            self.logger.warning(f"Business logic error creating ETF {ticker}: {str(e)}")
             flash(f"Errore: {str(e)}", "danger")
         except Exception as e:
             # Catch-all for unexpected errors
+            self.logger.exception(f"Unexpected error creating ETF {ticker}: {str(e)}")
             flash(f"Errore imprevisto: {str(e)}", "danger")
 
         return redirect(url_for("etf.index"))
 
     def edit(self, ticker):
         """Display form to edit an ETF"""
+        self.logger.info(f"Fetching ETF {ticker} for editing")
         etf = self.etf_service.get_by_ticker(ticker)
         if not etf:
+            self.logger.warning(f"ETF {ticker} not found for editing")
             flash("ETF non trovato", "danger")
             return redirect(url_for("etf.index"))
         return render_template("etf/edit.html", etf=etf)
 
     def update(self, ticker):
         """Update an existing ETF"""
+        self.logger.info(f"Attempting to update ETF {ticker}")
         try:
             # Create DTO from form data with validation
             etf_dto = ETF(
@@ -100,38 +116,50 @@ class EtfController:
 
             # Call service - exceptions propagate from context manager
             self.etf_service.update(etf_dto)
+            self.logger.info(f"ETF {ticker} updated successfully")
             flash(f"ETF {ticker} aggiornato con successo!", "success")
 
         except ValidationError as e:
             errors = "; ".join([f"{err['loc'][0]}: {err['msg']}" for err in e.errors()])
+            self.logger.warning(f"Validation error updating ETF {ticker}: {errors}")
             flash(f"Errori di validazione: {errors}", "danger")
         except SQLAlchemyError as e:
+            self.logger.error(f"Database error updating ETF {ticker}: {str(e)}")
             flash(f"Errore database: {str(e)}", "danger")
         except ValueError as e:
+            self.logger.warning(f"Business logic error updating ETF {ticker}: {str(e)}")
             flash(f"Errore: {str(e)}", "danger")
         except Exception as e:
+            self.logger.exception(f"Unexpected error updating ETF {ticker}: {str(e)}")
             flash(f"Errore imprevisto: {str(e)}", "danger")
 
         return redirect(url_for("etf.index"))
 
     def delete(self, ticker):
         """Delete an ETF"""
+        self.logger.info(f"Attempting to delete ETF {ticker}")
         try:
             self.etf_service.delete(ticker)
+            self.logger.info(f"ETF {ticker} deleted successfully")
             flash(f"ETF {ticker} eliminato con successo!", "success")
         except SQLAlchemyError as e:
+            self.logger.error(f"Database error deleting ETF {ticker}: {str(e)}")
             flash(f"Errore database: {str(e)}", "danger")
         except ValueError as e:
+            self.logger.warning(f"ETF {ticker} not found for deletion")
             flash(f"Errore: {str(e)}", "danger")
         except Exception as e:
+            self.logger.exception(f"Unexpected error deleting ETF {ticker}: {str(e)}")
             flash(f"Errore imprevisto: {str(e)}", "danger")
 
         return redirect(url_for("etf.index"))
 
     def show(self, ticker):
         """Display ETF details"""
+        self.logger.info(f"Fetching ETF {ticker} details")
         etf = self.etf_service.get_by_ticker(ticker)
         if not etf:
+            self.logger.warning(f"ETF {ticker} not found")
             flash(f"ETF {ticker} non trovato!", "danger")
             return redirect(url_for("etf.index"))
 
@@ -143,19 +171,23 @@ class EtfController:
 
         # Get period from query parameter (default 1Y)
         period = request.args.get("period", "1Y")
+        self.logger.info(f"Fetching quotes for ETF {ticker}, period: {period}")
 
         try:
             # Use service layer to get quotes
             quotes = self.etf_service.get_quotes(ticker, period)
 
             if not quotes:
+                self.logger.warning(f"No quotes available for ETF {ticker}")
                 return jsonify({"error": "No quotes available"}), 404
 
             # Format data for Chart.js
             dates = [quote.date for quote in quotes]
             prices = [float(quote.close) for quote in quotes]
 
+            self.logger.info(f"Retrieved {len(quotes)} quotes for ETF {ticker}")
             return jsonify({"labels": dates, "data": prices, "ticker": ticker})
 
         except Exception as e:
+            self.logger.error(f"Error fetching quotes for ETF {ticker}: {str(e)}")
             return jsonify({"error": str(e)}), 500
