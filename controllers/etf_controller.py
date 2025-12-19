@@ -6,12 +6,13 @@ from flask import render_template, request, redirect, url_for, flash
 from dto import ETF
 from pydantic import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
+from services import EtfService
 
 
 class EtfController:
     """Controller for managing ETF routes"""
 
-    def __init__(self, etf_service):
+    def __init__(self, etf_service: EtfService):
         """
         Initialize EtfController with an EtfService instance
 
@@ -22,7 +23,7 @@ class EtfController:
 
     def index(self):
         """Display list of all ETFs"""
-        etfs = self.etf_service.get_all_etfs()
+        etfs = self.etf_service.get_all()
         return render_template("etf/index.html", etfs=etfs)
 
     def create(self):
@@ -50,8 +51,8 @@ class EtfController:
             )
 
             # Call service - exceptions propagate from context manager
-            etf = self.etf_service.create_etf(etf_dto)
-            flash(f"ETF {etf.ticker} creato con successo!", "success")
+            self.etf_service.create(etf_dto)
+            flash(f"ETF {etf_dto.ticker} creato con successo!", "success")
 
         except ValidationError as e:
             # Handle Pydantic validation errors
@@ -71,7 +72,7 @@ class EtfController:
 
     def edit(self, ticker):
         """Display form to edit an ETF"""
-        etf = self.etf_service.get_etf_by_ticker(ticker)
+        etf = self.etf_service.get_by_ticker(ticker)
         if not etf:
             flash("ETF non trovato", "danger")
             return redirect(url_for("etf.index"))
@@ -98,7 +99,7 @@ class EtfController:
             )
 
             # Call service - exceptions propagate from context manager
-            self.etf_service.update_etf(ticker, etf_dto)
+            self.etf_service.update(etf_dto)
             flash(f"ETF {ticker} aggiornato con successo!", "success")
 
         except ValidationError as e:
@@ -116,7 +117,7 @@ class EtfController:
     def delete(self, ticker):
         """Delete an ETF"""
         try:
-            self.etf_service.delete_etf(ticker)
+            self.etf_service.delete(ticker)
             flash(f"ETF {ticker} eliminato con successo!", "success")
         except SQLAlchemyError as e:
             flash(f"Errore database: {str(e)}", "danger")
@@ -129,7 +130,7 @@ class EtfController:
 
     def show(self, ticker):
         """Display ETF details"""
-        etf = self.etf_service.get_etf_by_ticker(ticker)
+        etf = self.etf_service.get_by_ticker(ticker)
         if not etf:
             flash(f"ETF {ticker} non trovato!", "danger")
             return redirect(url_for("etf.index"))

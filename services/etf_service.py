@@ -21,106 +21,113 @@ class EtfService:
         """
         self.db_manager = db_manager
 
-    def get_all_etfs(self):
-        """Retrieve all ETFs from database"""
-        return EtfDAO.query.all()
+    def get_all(self) -> list[ETF]:
+        """
+        Retrieve all ETFs from database
 
-    def get_etf_by_ticker(self, ticker):
-        """Retrieve a specific ETF by ticker"""
-        return EtfDAO.query.get(ticker)
+        Returns:
+            List of ETF DTOs
+        """
+        etf_daos = EtfDAO.query.all()
+        return [ETF.model_validate(dao) for dao in etf_daos]
 
-    def create_etf(self, etf_dto: ETF):
+    def get_by_ticker(self, ticker: str) -> ETF | None:
+        """
+        Retrieve a specific ETF by ticker
+
+        Args:
+            ticker: ETF ticker symbol
+
+        Returns:
+            ETF DTO if found, None otherwise
+        """
+        etf_dao = EtfDAO.query.get(ticker)
+        return ETF.model_validate(etf_dao) if etf_dao else None
+
+    def create(self, etf_dto: ETF) -> None:
         """
         Create a new ETF
 
         Args:
             etf_dto: ETF DTO with validated data
 
-        Returns:
-            EtfDAO: Created ETF model
-
         Raises:
             SQLAlchemyError: On database errors
         """
         with self.db_manager.get_session() as session:
-            etf = EtfDAO()
-            etf.ticker = etf_dto.ticker
-            etf.name = etf_dto.name
-            etf.isin = etf_dto.isin
-            etf.launchDate = etf_dto.launchDate
-            etf.capital = etf_dto.capital
-            etf.replication = etf_dto.replication
-            etf.volatility = etf_dto.volatility
-            etf.currency = etf_dto.currency
-            etf.dividendType = etf_dto.dividendType
-            etf.dividendFrequency = etf_dto.dividendFrequency
-            etf.yeld = etf_dto.yeld
-            session.add(etf)
-            # Commit happens automatically via context manager
-        return etf
+            etf_dao = EtfDAO()
+            etf_dao.ticker = etf_dto.ticker
+            etf_dao.name = etf_dto.name
+            etf_dao.isin = etf_dto.isin
+            etf_dao.launchDate = etf_dto.launchDate
+            etf_dao.capital = etf_dto.capital
+            etf_dao.replication = etf_dto.replication
+            etf_dao.volatility = etf_dto.volatility
+            etf_dao.currency = etf_dto.currency
+            etf_dao.dividendType = etf_dto.dividendType
+            etf_dao.dividendFrequency = etf_dto.dividendFrequency
+            etf_dao.yeld = etf_dto.yeld
+            session.add(etf_dao)
 
-    def update_etf(self, ticker, etf_dto: ETF):
+    def update(self, etf_dto: ETF) -> None:
         """
         Update an existing ETF
 
         Args:
-            ticker: Ticker of the ETF to update
-            etf_dto: ETF DTO with new validated data
-
-        Returns:
-            EtfDAO: Updated ETF model
+            etf_dto: ETF DTO with new validated data (ticker identifies the record)
 
         Raises:
             ValueError: If ETF not found
             SQLAlchemyError: On database errors
         """
         with self.db_manager.get_session():
-            etf = EtfDAO.query.get(ticker)
-            if not etf:
-                raise ValueError(f"ETF {ticker} not found")
+            etf_dao = EtfDAO.query.get(etf_dto.ticker)
+            if not etf_dao:
+                raise ValueError(f"ETF {etf_dto.ticker} not found")
 
             # Update all fields from DTO
-            etf.name = etf_dto.name
-            etf.isin = etf_dto.isin
-            etf.launchDate = etf_dto.launchDate
-            etf.capital = etf_dto.capital
-            etf.replication = etf_dto.replication
-            etf.volatility = etf_dto.volatility
-            etf.currency = etf_dto.currency
-            etf.dividendType = etf_dto.dividendType
-            etf.dividendFrequency = etf_dto.dividendFrequency
-            etf.yeld = etf_dto.yeld
-            # Commit happens automatically via context manager
-        return etf
+            etf_dao.name = etf_dto.name
+            etf_dao.isin = etf_dto.isin
+            etf_dao.launchDate = etf_dto.launchDate
+            etf_dao.capital = etf_dto.capital
+            etf_dao.replication = etf_dto.replication
+            etf_dao.volatility = etf_dto.volatility
+            etf_dao.currency = etf_dto.currency
+            etf_dao.dividendType = etf_dto.dividendType
+            etf_dao.dividendFrequency = etf_dto.dividendFrequency
+            etf_dao.yeld = etf_dto.yeld
 
-    def delete_etf(self, ticker):
+    def delete(self, ticker: str) -> None:
         """
         Delete an ETF
 
         Args:
             ticker: Ticker of the ETF to delete
 
-        Returns:
-            bool: True if deleted successfully
-
         Raises:
             ValueError: If ETF not found
             SQLAlchemyError: On database errors
         """
         with self.db_manager.get_session() as session:
-            etf = EtfDAO.query.get(ticker)
-            if not etf:
+            etf_dao = EtfDAO.query.get(ticker)
+            if not etf_dao:
                 raise ValueError(f"ETF {ticker} not found")
 
-            session.delete(etf)
-            # Commit happens automatically via context manager
-        return True
+            session.delete(etf_dao)
 
-    def etf_exists(self, ticker):
-        """Check if an ETF exists"""
+    def exists(self, ticker: str) -> bool:
+        """
+        Check if an ETF exists
+
+        Args:
+            ticker: ETF ticker symbol
+
+        Returns:
+            True if exists, False otherwise
+        """
         return EtfDAO.query.get(ticker) is not None
 
-    def get_quotes(self, ticker, period="1Y"):
+    def get_quotes(self, ticker: str, period: str = "1Y") -> list[Quote]:
         """
         Retrieve quotes for an ETF within a specific period
 
@@ -129,7 +136,7 @@ class EtfService:
             period: Time period (5D, 1M, 3M, 6M, 1Y, YTD, 5Y, Max)
 
         Returns:
-            list: List of QuoteDTO objects or empty list if none found
+            List of Quote DTOs
         """
         # Calculate start date based on period
         period_map = {
@@ -152,7 +159,7 @@ class EtfService:
         )
 
         # Convert DAOs to DTOs
-        quote_dtos = [
+        return [
             Quote(
                 ticker=q.Ticker,
                 date=q.Date,
@@ -164,5 +171,3 @@ class EtfService:
             )
             for q in quote_daos
         ]
-
-        return quote_dtos
