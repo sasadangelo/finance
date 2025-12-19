@@ -1,3 +1,7 @@
+# -----------------------------------------------------------------------------
+# Copyright (c) 2025 Salvatore D'Angelo, Code4Projects
+# Licensed under the MIT License. See LICENSE.md for details.
+# -----------------------------------------------------------------------------
 [project]
 authors = [
   {name = "Salvatore D'Angelo", email = "sasadangelo@gmail.com"},
@@ -32,6 +36,9 @@ dependencies = [
   "flask>=3.0.0",
   "flask-sqlalchemy>=3.1.0",
   "pydantic>=2.12.5",
+  "pydantic-settings>=2.0.0",
+  "pyyaml>=6.0.0",
+  "python-dotenv>=1.0.0",
 ]
 
 [project.optional-dependencies]
