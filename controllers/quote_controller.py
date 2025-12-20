@@ -2,6 +2,7 @@
 # Copyright (c) 2025 Salvatore D'Angelo, Code4Projects
 # Licensed under the MIT License. See LICENSE.md for details.
 # -----------------------------------------------------------------------------
+from typing import Any
 from dto import Quote, QuoteResponse, ErrorResponse, QuotePeriod
 from flask import jsonify, request, Response, current_app
 from core import LoggerManager
@@ -81,7 +82,7 @@ class QuoteController:
 
         try:
             # Delegate to Application Service (orchestration)
-            result = self.etf_service.update_etf_quotes(ticker)
+            result: dict[str, Any] = self.etf_service.update_etf_quotes(ticker)
 
             status_code: int = 200 if result["success"] else (404 if "non trovato" in result["message"] else 500)
             return jsonify(result), status_code

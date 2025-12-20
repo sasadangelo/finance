@@ -4,7 +4,7 @@
 # -----------------------------------------------------------------------------
 from __future__ import annotations
 from models import EtfDAO
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from core.database import DatabaseManager
 from core.log import LoggerManager
 from dto import ETF
@@ -153,7 +153,7 @@ class EtfService:
         self.logger.debug(f"ETF {ticker} exists: {exists}")
         return exists
 
-    def update_etf_quotes(self, ticker: str) -> dict:
+    def update_etf_quotes(self, ticker: str) -> dict[str, Any]:
         """
         Update quotes for a specific ETF (Application Service - Orchestration)
 

@@ -3,9 +3,10 @@
 # Licensed under the MIT License. See LICENSE.md for details.
 # -----------------------------------------------------------------------------
 import json
-from typing import Generator, Callable
+from typing import Any, Generator, Callable
 from sqlalchemy.exc import SQLAlchemyError
-from core.log import LoggerManager
+from core import LoggerManager
+from dto import ETF
 
 
 class QuoteSSEHandler:
@@ -26,9 +27,11 @@ class QuoteSSEHandler:
         Returns:
             SSE formatted string
         """
-        return f"data: {json.dumps(data)}\n\n"
+        return f"data: {json.dumps(obj=data)}\n\n"
 
-    def create_progress_event(self, index: int, total: int, ticker: str, name: str, status: str, message: str) -> dict:
+    def create_progress_event(
+        self, index: int, total: int, ticker: str, name: str, status: str, message: str
+    ) -> dict[str, Any]:
         """Create progress event data for quote updates"""
         return {
             "progress": int((index / total) * 100),
@@ -40,7 +43,7 @@ class QuoteSSEHandler:
             "message": message,
         }
 
-    def create_completion_event(self, total: int, success_count: int, failed_etfs: list) -> dict:
+    def create_completion_event(self, total: int, success_count: int, failed_etfs: list) -> dict[str, Any]:
         """Create completion event data for quote updates"""
         return {
             "done": True,
@@ -56,11 +59,13 @@ class QuoteSSEHandler:
             ),
         }
 
-    def create_error_event(self, message: str) -> dict:
+    def create_error_event(self, message: str) -> dict[str, Any]:
         """Create error event data"""
         return {"error": True, "message": message}
 
-    def _process_single_etf(self, etf, index: int, total: int, update_func: Callable) -> tuple[str, bool, dict | None]:
+    def _process_single_etf(
+        self, etf: ETF, index: int, total: int, update_func: Callable
+    ) -> tuple[str, bool, dict[str, str] | None]:
         """
         Process update for a single ETF
 
@@ -76,23 +81,27 @@ class QuoteSSEHandler:
         try:
             update_func(etf)
 
-            event_data = self.create_progress_event(index, total, etf.ticker, etf.name, "success", "Aggiornato")
+            event_data: dict[str, Any] = self.create_progress_event(
+                index, total, ticker=etf.ticker, name=etf.name, status="success", message="Aggiornato"
+            )
             self.logger.debug(f"SSE: Updated {etf.ticker} ({index}/{total})")
 
             return self.format_event(data=event_data), True, None
 
         except (ValueError, SQLAlchemyError) as e:
-            error_message = str(e)
-            error_dict = {
+            error_message: str = str(e)
+            error_dict: dict[str, str] = {
                 "ticker": etf.ticker,
                 "name": etf.name,
                 "error": error_message,
             }
 
-            event_data = self.create_progress_event(index, total, etf.ticker, etf.name, "error", error_message)
+            event_data = self.create_progress_event(
+                index, total, ticker=etf.ticker, name=etf.name, status="error", message=error_message
+            )
             self.logger.warning(f"SSE: Failed to update {etf.ticker}: {error_message}")
 
-            return self.format_event(event_data), False, error_dict
+            return self.format_event(data=event_data), False, error_dict
 
     def generate_bulk_quote_update_events(self, etfs: list, update_func: Callable) -> Generator[str, None, None]:
         """
@@ -105,16 +114,16 @@ class QuoteSSEHandler:
         Yields:
             SSE formatted event strings
         """
-        total = len(etfs)
+        total: int = len(etfs)
 
         if total == 0:
-            yield self.format_event({"error": "Nessun ETF trovato nel database"})
+            yield self.format_event(data={"error": "Nessun ETF trovato nel database"})
             return
 
         self.logger.info(f"Starting bulk quote update for {total} ETFs via SSE")
 
         success_count = 0
-        failed_etfs = []
+        failed_etfs: list[dict[str, str]] = []
 
         for index, etf in enumerate(etfs, 1):
             event, success, error = self._process_single_etf(etf, index, total, update_func)
@@ -126,7 +135,7 @@ class QuoteSSEHandler:
                 failed_etfs.append(error)
 
         # Send completion event
-        completion_data = self.create_completion_event(total, success_count, failed_etfs)
-        yield self.format_event(completion_data)
+        completion_data: dict[str, Any] = self.create_completion_event(total, success_count, failed_etfs)
+        yield self.format_event(data=completion_data)
 
         self.logger.info(f"SSE: Bulk quote update completed - {success_count}/{total} successful")
