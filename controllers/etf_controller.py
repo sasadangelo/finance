@@ -89,11 +89,63 @@ class EtfController:
             flash(f"Errore imprevisto: {str(error)}", "danger")
 
     def index(self) -> WebResponse:
-        """Display list of all ETFs"""
-        self.logger.info("Fetching all ETFs for index page")
-        etfs: list[ETF] = self.etf_service.get_all()
-        self.logger.info(f"Retrieved {len(etfs)} ETFs")
-        return render_template(template_name_or_list="etf/index.html", etfs=etfs)
+        """Display list of all ETFs with optional filters"""
+        from dto.etf_screener_filters import ETFScreenerFilters
+        from dto.etf_asset_type import ETFAssetType
+
+        self.logger.info("Fetching ETFs for index page")
+
+        # Get filter parameters from request
+        asset_type_str = request.args.get("asset_type")
+        min_capital_str = request.args.get("min_capital")
+        min_age_years_str = request.args.get("min_age_years")
+
+        # Check if any filter is applied
+        has_filters = any(
+            [
+                asset_type_str,
+                request.args.get("dividend_type"),
+                request.args.get("currency"),
+                request.args.get("replication"),
+                min_capital_str,
+                min_age_years_str,
+            ]
+        )
+
+        # Create filters object
+        filters = ETFScreenerFilters(
+            asset_type=ETFAssetType(asset_type_str) if asset_type_str else None,
+            dividend_type=request.args.get("dividend_type") or None,
+            currency=request.args.get("currency") or None,
+            replication=request.args.get("replication") or None,
+            min_capital=float(min_capital_str) if min_capital_str else None,
+            min_age_years=int(min_age_years_str) if min_age_years_str else None,
+        )
+
+        # Get ETFs (filtered or all)
+        if has_filters:
+            etfs = self.etf_service.screen_etfs(filters)
+            self.logger.info(f"Screener returned {len(etfs)} ETFs")
+        else:
+            etfs = self.etf_service.get_all()
+            self.logger.info(f"Retrieved {len(etfs)} ETFs")
+
+        # Get unique values for filter dropdowns
+        all_etfs: list[ETF] = self.etf_service.get_all()
+        currencies = sorted(set(etf.currency for etf in all_etfs if etf.currency))
+        replications = sorted(set(etf.replication for etf in all_etfs if etf.replication))
+        dividend_types = sorted(set(etf.dividendType for etf in all_etfs if etf.dividendType))
+
+        return render_template(
+            template_name_or_list="etf/index.html",
+            etfs=etfs,
+            filters=filters,
+            asset_types=ETFAssetType,
+            currencies=currencies,
+            replications=replications,
+            dividend_types=dividend_types,
+            has_filters=has_filters,
+        )
 
     def create(self) -> WebResponse:
         """Display form to create a new ETF"""

@@ -3,11 +3,14 @@
 # Licensed under the MIT License. See LICENSE.md for details.
 # -----------------------------------------------------------------------------
 from __future__ import annotations
+from datetime import datetime
 from models import EtfDAO
 from typing import TYPE_CHECKING, Any
 from core.database import DatabaseManager
 from core.log import LoggerManager
 from dto import ETF
+from dto.etf_screener_filters import ETFScreenerFilters
+from mappers.etf_mapper import EtfMapper
 
 if TYPE_CHECKING:
     from services.quote_service import QuoteService
@@ -16,7 +19,7 @@ if TYPE_CHECKING:
 class EtfService:
     """Application Service for ETF management and orchestration"""
 
-    def __init__(self, db_manager: DatabaseManager, quote_service: "QuoteService"):
+    def __init__(self, db_manager: DatabaseManager, quote_service: "QuoteService") -> None:
         """
         Initialize EtfService with dependencies
 
@@ -26,7 +29,7 @@ class EtfService:
         """
         self.db_manager = db_manager
         self.quote_service = quote_service
-        self.logger = LoggerManager.get_logger(self.__class__.__name__)
+        self.logger = LoggerManager.get_logger(name=self.__class__.__name__)
         self.logger.info("EtfService initialized")
 
     def get_all(self) -> list[ETF]:
@@ -39,7 +42,7 @@ class EtfService:
         self.logger.debug("Fetching all ETFs from database")
         etf_daos: list[EtfDAO] = EtfDAO.query.all()
         self.logger.info(f"Retrieved {len(etf_daos)} ETFs from database")
-        return [ETF.model_validate(dao) for dao in etf_daos]
+        return [EtfMapper.to_dto(dao) for dao in etf_daos]
 
     def get_by_ticker(self, ticker: str) -> ETF | None:
         """
@@ -52,10 +55,10 @@ class EtfService:
             ETF DTO if found, None otherwise
         """
         self.logger.debug(f"Fetching ETF with ticker: {ticker}")
-        etf_dao = EtfDAO.query.get(ident=ticker)
+        etf_dao: EtfDAO | None = EtfDAO.query.get(ident=ticker)
         if etf_dao:
             self.logger.debug(f"ETF {ticker} found in database")
-            return ETF.model_validate(etf_dao)
+            return EtfMapper.to_dto(dao=etf_dao)
         else:
             self.logger.debug(f"ETF {ticker} not found in database")
             return None
@@ -72,19 +75,7 @@ class EtfService:
         """
         self.logger.info(f"Creating new ETF: {etf_dto.ticker}")
         with self.db_manager.get_session() as session:
-            etf_dao: EtfDAO = EtfDAO()
-            etf_dao.ticker = etf_dto.ticker
-            etf_dao.name = etf_dto.name
-            etf_dao.isin = etf_dto.isin
-            etf_dao.launchDate = etf_dto.launchDate
-            etf_dao.capital = etf_dto.capital
-            etf_dao.replication = etf_dto.replication
-            etf_dao.volatility = etf_dto.volatility
-            etf_dao.currency = etf_dto.currency
-            etf_dao.dividendType = etf_dto.dividendType
-            etf_dao.dividendFrequency = etf_dto.dividendFrequency
-            etf_dao.yeld = etf_dto.yeld
-            etf_dao.assetType = etf_dto.assetType.value if etf_dto.assetType else None
+            etf_dao: EtfDAO = EtfMapper.to_dao(etf_dto)
             session.add(instance=etf_dao)
             self.logger.info(f"ETF {etf_dto.ticker} created successfully in database")
 
@@ -101,23 +92,13 @@ class EtfService:
         """
         self.logger.info(f"Updating ETF: {etf_dto.ticker}")
         with self.db_manager.get_session():
-            etf_dao = EtfDAO.query.get(etf_dto.ticker)
+            etf_dao: EtfDAO | None = EtfDAO.query.get(ident=etf_dto.ticker)
             if not etf_dao:
                 self.logger.error(f"ETF {etf_dto.ticker} not found for update")
                 raise ValueError(f"ETF {etf_dto.ticker} not found")
 
-            # Update all fields from DTO
-            etf_dao.name = etf_dto.name
-            etf_dao.isin = etf_dto.isin
-            etf_dao.launchDate = etf_dto.launchDate
-            etf_dao.capital = etf_dto.capital
-            etf_dao.replication = etf_dto.replication
-            etf_dao.volatility = etf_dto.volatility
-            etf_dao.currency = etf_dto.currency
-            etf_dao.dividendType = etf_dto.dividendType
-            etf_dao.dividendFrequency = etf_dto.dividendFrequency
-            etf_dao.yeld = etf_dto.yeld
-            etf_dao.assetType = etf_dto.assetType.value if etf_dto.assetType else None
+            # Update DAO using mapper
+            EtfMapper.to_dao(etf_dto, dao=etf_dao)
             self.logger.info(f"ETF {etf_dto.ticker} updated successfully in database")
 
     def delete(self, ticker: str) -> None:
@@ -133,12 +114,12 @@ class EtfService:
         """
         self.logger.info(f"Deleting ETF: {ticker}")
         with self.db_manager.get_session() as session:
-            etf_dao = EtfDAO.query.get(ticker)
+            etf_dao: EtfDAO | None = EtfDAO.query.get(ticker)
             if not etf_dao:
                 self.logger.error(f"ETF {ticker} not found for deletion")
                 raise ValueError(f"ETF {ticker} not found")
 
-            session.delete(etf_dao)
+            session.delete(instance=etf_dao)
             self.logger.info(f"ETF {ticker} deleted successfully from database")
 
     def exists(self, ticker: str) -> bool:
@@ -151,7 +132,7 @@ class EtfService:
         Returns:
             True if exists, False otherwise
         """
-        exists = EtfDAO.query.get(ticker) is not None
+        exists: bool = EtfDAO.query.get(ident=ticker) is not None
         self.logger.debug(f"ETF {ticker} exists: {exists}")
         return exists
 
@@ -188,7 +169,7 @@ class EtfService:
             return {"success": True, "ticker": ticker, "message": message}
 
         except Exception as e:
-            error_message = f"Errore durante l'aggiornamento: {str(e)}"
+            error_message: str = f"Errore durante l'aggiornamento: {str(e)}"
             self.logger.error(f"Failed to update quotes for {ticker}: {error_message}")
             return {"success": False, "ticker": ticker, "message": error_message}
 
@@ -216,55 +197,163 @@ class EtfService:
 
         if total == 0:
             self.logger.warning("No ETFs found in database")
-            return {
-                "success": False,
-                "message": "Nessun ETF trovato nel database",
-                "total": 0,
-                "success_count": 0,
-                "failed_count": 0,
-                "failed_etfs": [],
-                "results": [],
-            }
+            return self._create_empty_summary()
 
         self.logger.info(f"Found {total} ETFs to update")
 
-        # Delegate to QuoteService for each ETF
+        # Process all ETFs and collect results
         results = []
-        success_count = 0
         failed_etfs = []
 
         for index, etf in enumerate(etfs, 1):
             self.logger.info(f"Processing ETF {index}/{total}: {etf.ticker}")
+            result = self._update_single_etf_quotes(etf)
+            results.append(result)
 
-            try:
-                self.quote_service.update_quotes(etf.ticker)
-                message = "Aggiornato"
-                results.append({"success": True, "ticker": etf.ticker, "message": message})
-                success_count += 1
+            if not result["success"]:
+                failed_etfs.append({"ticker": etf.ticker, "name": etf.name, "error": result["message"]})
 
-            except Exception as e:
-                error_message = str(e)
-                self.logger.error(f"Failed to update {etf.ticker}: {error_message}")
-                results.append({"success": False, "ticker": etf.ticker, "message": error_message})
-                failed_etfs.append({"ticker": etf.ticker, "name": etf.name, "error": error_message})
+        # Prepare and return summary
+        return self._create_update_summary(total, results, failed_etfs)
 
-        # Prepare summary
+    def _update_single_etf_quotes(self, etf: ETF) -> dict[str, Any]:
+        """
+        Update quotes for a single ETF
+
+        Args:
+            etf: ETF to update
+
+        Returns:
+            Dictionary with update result
+        """
+        try:
+            self.quote_service.update_quotes(etf.ticker)
+            return {"success": True, "ticker": etf.ticker, "message": "Aggiornato"}
+        except Exception as e:
+            error_message = str(e)
+            self.logger.error(f"Failed to update {etf.ticker}: {error_message}")
+            return {"success": False, "ticker": etf.ticker, "message": error_message}
+
+    def _create_empty_summary(self) -> dict[str, Any]:
+        """Create summary for empty ETF list"""
+        return {
+            "success": False,
+            "message": "Nessun ETF trovato nel database",
+            "total": 0,
+            "success_count": 0,
+            "failed_count": 0,
+            "failed_etfs": [],
+            "results": [],
+        }
+
+    def _create_update_summary(self, total: int, results: list[dict], failed_etfs: list[dict]) -> dict[str, Any]:
+        """
+        Create summary for bulk update operation
+
+        Args:
+            total: Total number of ETFs processed
+            results: List of individual update results
+            failed_etfs: List of failed ETF updates
+
+        Returns:
+            Summary dictionary
+        """
+        success_count = sum(1 for r in results if r["success"])
+        failed_count = len(failed_etfs)
+
         summary = {
-            "success": len(failed_etfs) == 0,
+            "success": failed_count == 0,
             "total": total,
             "success_count": success_count,
-            "failed_count": len(failed_etfs),
+            "failed_count": failed_count,
             "failed_etfs": failed_etfs,
             "results": results,
         }
 
-        if len(failed_etfs) == 0:
+        if failed_count == 0:
             summary["message"] = f"Tutti i {total} ETF sono stati aggiornati con successo!"
             self.logger.info(f"Bulk update completed successfully: {success_count}/{total}")
         else:
-            summary["message"] = f"Aggiornamento completato: {success_count} successi, {len(failed_etfs)} errori"
-            self.logger.warning(
-                f"Bulk update completed with errors: {success_count} success, {len(failed_etfs)} failed"
-            )
+            summary["message"] = f"Aggiornamento completato: {success_count} successi, {failed_count} errori"
+            self.logger.warning(f"Bulk update completed with errors: {success_count} success, {failed_count} failed")
 
         return summary
+
+    def screen_etfs(self, filters: ETFScreenerFilters) -> list[ETF]:
+        """
+        Screen ETFs based on provided filters
+
+        Args:
+            filters: ETFScreenerFilters DTO with filter criteria
+
+        Returns:
+            List of ETF DTOs matching the filters
+        """
+        self.logger.debug(f"Screening ETFs with filters: {filters}")
+
+        # Get all ETFs and convert to DTOs using mapper
+        etf_daos: list[EtfDAO] = EtfDAO.query.all()
+        all_etfs: list[ETF] = [EtfMapper.to_dto(dao) for dao in etf_daos]
+
+        # Apply filters using list comprehension
+        filtered_etfs: list[ETF] = [etf for etf in all_etfs if self._matches_filters(etf, filters)]
+
+        self.logger.info(f"Screener found {len(filtered_etfs)} ETFs matching filters")
+        return filtered_etfs
+
+    def _matches_filters(self, etf: ETF, filters: ETFScreenerFilters) -> bool:
+        """
+        Check if an ETF matches all provided filters
+
+        Args:
+            etf: ETF to check
+            filters: Filter criteria
+
+        Returns:
+            True if ETF matches all filters, False otherwise
+        """
+        # Asset type filter
+        if filters.asset_type is not None and etf.assetType != filters.asset_type:
+            return False
+
+        # Dividend type filter
+        if filters.dividend_type and etf.dividendType != filters.dividend_type:
+            return False
+
+        # Currency filter
+        if filters.currency and etf.currency != filters.currency:
+            return False
+
+        # Replication type filter
+        if filters.replication and (not etf.replication or etf.replication != filters.replication):
+            return False
+
+        # Fund size filter
+        if filters.min_capital is not None and (not etf.capital or etf.capital < filters.min_capital):
+            return False
+
+        # Age filter
+        if filters.min_age_years is not None:
+            age_years: float | None = self._calculate_etf_age(launch_date_str=etf.launchDate)
+            if age_years is None or age_years < filters.min_age_years:
+                return False
+
+        return True
+
+    def _calculate_etf_age(self, launch_date_str: str) -> float | None:
+        """
+        Calculate ETF age in years from launch date string
+
+        Args:
+            launch_date_str: Launch date in YYYY-MM-DD format
+
+        Returns:
+            Age in years, or None if date is invalid
+        """
+        try:
+            launch_date: datetime = datetime.strptime(launch_date_str, "%Y-%m-%d")
+            current_date: datetime = datetime.now()
+            age_days: int = (current_date - launch_date).days
+            return age_days / 365.25  # Account for leap years
+        except (ValueError, AttributeError):
+            return None
