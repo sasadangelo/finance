@@ -211,6 +211,3 @@ def setup_logging(
         retention=retention,
         compression=compression,
     )
-
-
-# Made with Bob

@@ -134,7 +134,7 @@
         progressText.textContent = 'Connessione al server...';
 
         // Create EventSource for SSE
-        const eventSource = new EventSource('/etfs/quotes/update-all-stream');
+        const eventSource = new EventSource('/etfs/quotes/update_all');
         const failedEtfs = [];
 
         eventSource.onmessage = function (event) {

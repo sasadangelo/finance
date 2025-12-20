@@ -4,5 +4,6 @@
 # -----------------------------------------------------------------------------
 from .etf_controller import EtfController
 from .quote_controller import QuoteController
+from .types import WebResponse, APIResponse
 
-__all__ = ["EtfController", "QuoteController"]
+__all__ = ["EtfController", "QuoteController", "WebResponse", "APIResponse"]

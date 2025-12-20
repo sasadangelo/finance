@@ -7,7 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import SQLAlchemyError
 import logging
 
-db = SQLAlchemy()
+db: SQLAlchemy = SQLAlchemy()
 
 
 class DatabaseManager:
@@ -16,7 +16,7 @@ class DatabaseManager:
     Provides automatic transaction management with commit/rollback.
     """
 
-    def __init__(self, db_instance=None):
+    def __init__(self, db_instance=None) -> None:
         """
         Initialize DatabaseManager
 
@@ -24,7 +24,7 @@ class DatabaseManager:
             db_instance: SQLAlchemy instance (optional, defaults to global db)
         """
         self._db = db_instance or db
-        self._logger = logging.getLogger(__name__)
+        self._logger = logging.getLogger(name=__name__)
 
     @contextmanager
     def get_session(self):

@@ -5,5 +5,7 @@
 from .etf import ETF
 from .quote import Quote
 from .quote_period import QuotePeriod
+from .quote_response import QuoteResponse
+from .error_response import ErrorResponse
 
-__all__ = ["ETF", "Quote", "QuotePeriod"]
+__all__ = ["ETF", "Quote", "QuotePeriod", "QuoteResponse", "ErrorResponse"]
