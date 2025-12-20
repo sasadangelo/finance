@@ -9,8 +9,7 @@ app:
   port: 5001
 
 database:
-  uri: "database/etfs.db"
-  track_modifications: false
+  relative_path: "database/etfs.db"
 # Logging configuration (all parameters are optional with defaults)
 # log:
 #   level: "INFO"              # Default: INFO (DEBUG, INFO, WARNING, ERROR, CRITICAL)

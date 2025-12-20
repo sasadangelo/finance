@@ -7,8 +7,8 @@ Application bootstrap module.
 Handles initialization of services and controllers using the init_app pattern.
 """
 from core.database import DatabaseManager
-from services import EtfService
-from controllers import EtfController
+from controllers import QuoteController, EtfController
+from services import EtfService, QuoteService
 
 
 def init_app(app, db):
@@ -26,14 +26,17 @@ def init_app(app, db):
         None (modifies app in place by adding attributes)
     """
     # Initialize DatabaseManager
-    db_manager = DatabaseManager(db)
+    db_manager: DatabaseManager = DatabaseManager(db)
 
-    # Initialize Services
-    etf_service = EtfService(db_manager)
+    # Initialize Services (Domain Services first, then Application Services)
+    quote_service: QuoteService = QuoteService(db_manager)
+    etf_service: EtfService = EtfService(db_manager, quote_service)
 
-    # Initialize Controllers
-    etf_controller = EtfController(etf_service)
+    # Initialize Controllers (Presentation Layer)
+    etf_controller: EtfController = EtfController(etf_service)
+    quote_controller: QuoteController = QuoteController(quote_service, etf_service)
 
     # Attach controllers to app instance
-    # This allows access via current_app.etf_controller in routes
+    # This allows access via current_app.etf_controller and current_app.quote_controller in routes
     app.etf_controller = etf_controller
+    app.quote_controller = quote_controller

@@ -59,4 +59,22 @@ def delete(ticker):
 # Route to get quote data (JSON API)
 @etf_bp.route("/etfs/<string:ticker>/quotes")
 def get_quotes(ticker):
-    return app.etf_controller.get_quotes(ticker)
+    return app.quote_controller.get_quotes(ticker)
+
+
+# Route to update quotes for a single ETF
+@etf_bp.route("/etfs/<string:ticker>/quotes/update", methods=["POST"])
+def update_quotes_single(ticker):
+    return app.quote_controller.update_single(ticker)
+
+
+# Route to update quotes for all ETFs
+# @etf_bp.route("/etfs/quotes/update-all", methods=["POST"])
+# def update_quotes_all():
+#     return app.quote_controller.update_all()
+
+
+# Route to update quotes for all ETFs with SSE (Server-Sent Events)
+@etf_bp.route("/etfs/quotes/update-all-stream")
+def update_quotes_all_stream():
+    return app.quote_controller.update_all_stream()

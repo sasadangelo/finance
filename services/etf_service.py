@@ -2,25 +2,30 @@
 # Copyright (c) 2025 Salvatore D'Angelo, Code4Projects
 # Licensed under the MIT License. See LICENSE.md for details.
 # -----------------------------------------------------------------------------
-from models import EtfDAO, QuoteDAO
+from __future__ import annotations
+from models import EtfDAO
+from typing import TYPE_CHECKING
 from core.database import DatabaseManager
 from core.log import LoggerManager
-from dto import ETF, Quote
-import datetime as dt
-from dateutil.relativedelta import relativedelta
+from dto import ETF
+
+if TYPE_CHECKING:
+    from services.quote_service import QuoteService
 
 
 class EtfService:
-    """Service layer for ETF management"""
+    """Application Service for ETF management and orchestration"""
 
-    def __init__(self, db_manager: DatabaseManager):
+    def __init__(self, db_manager: DatabaseManager, quote_service: "QuoteService"):
         """
-        Initialize EtfService with a DatabaseManager instance
+        Initialize EtfService with dependencies
 
         Args:
             db_manager: DatabaseManager instance for session handling
+            quote_service: QuoteService instance for quote operations
         """
         self.db_manager = db_manager
+        self.quote_service = quote_service
         self.logger = LoggerManager.get_logger(self.__class__.__name__)
         self.logger.info("EtfService initialized")
 
@@ -32,7 +37,7 @@ class EtfService:
             List of ETF DTOs
         """
         self.logger.debug("Fetching all ETFs from database")
-        etf_daos = EtfDAO.query.all()
+        etf_daos: list[EtfDAO] = EtfDAO.query.all()
         self.logger.info(f"Retrieved {len(etf_daos)} ETFs from database")
         return [ETF.model_validate(dao) for dao in etf_daos]
 
@@ -67,7 +72,7 @@ class EtfService:
         """
         self.logger.info(f"Creating new ETF: {etf_dto.ticker}")
         with self.db_manager.get_session() as session:
-            etf_dao = EtfDAO()
+            etf_dao: EtfDAO = EtfDAO()
             etf_dao.ticker = etf_dto.ticker
             etf_dao.name = etf_dto.name
             etf_dao.isin = etf_dto.isin
@@ -79,7 +84,7 @@ class EtfService:
             etf_dao.dividendType = etf_dto.dividendType
             etf_dao.dividendFrequency = etf_dto.dividendFrequency
             etf_dao.yeld = etf_dto.yeld
-            session.add(etf_dao)
+            session.add(instance=etf_dao)
             self.logger.info(f"ETF {etf_dto.ticker} created successfully in database")
 
     def update(self, etf_dto: ETF) -> None:
@@ -148,52 +153,116 @@ class EtfService:
         self.logger.debug(f"ETF {ticker} exists: {exists}")
         return exists
 
-    def get_quotes(self, ticker: str, period: str = "1Y") -> list[Quote]:
+    def update_etf_quotes(self, ticker: str) -> dict:
         """
-        Retrieve quotes for an ETF within a specific period
+        Update quotes for a specific ETF (Application Service - Orchestration)
 
         Args:
             ticker: ETF ticker symbol
-            period: Time period (5D, 1M, 3M, 6M, 1Y, YTD, 5Y, Max)
 
         Returns:
-            List of Quote DTOs
+            Dictionary with status information:
+            {
+                'success': bool,
+                'ticker': str,
+                'message': str
+            }
         """
-        self.logger.info(f"Fetching quotes for ETF {ticker}, period: {period}")
+        self.logger.info(f"Orchestrating quote update for ETF: {ticker}")
 
-        # Calculate start date based on period
-        period_map = {
-            "Max": dt.datetime(1970, 1, 1),
-            "5Y": dt.datetime.now() - relativedelta(years=5),
-            "1Y": dt.datetime.now() - relativedelta(years=1),
-            "YTD": dt.datetime(dt.datetime.now().year, 1, 1),
-            "6M": dt.datetime.now() - relativedelta(months=6),
-            "3M": dt.datetime.now() - relativedelta(months=3),
-            "1M": dt.datetime.now() - relativedelta(months=1),
-            "5D": dt.datetime.now() - relativedelta(days=5),
+        try:
+            # Check if ETF exists
+            etf: ETF | None = self.get_by_ticker(ticker)
+            if not etf:
+                self.logger.warning(f"ETF {ticker} not found")
+                return {"success": False, "ticker": ticker, "message": f"ETF {ticker} non trovato"}
+
+            # Delegate to QuoteService (Domain Service)
+            self.quote_service.update_quotes(ticker)
+
+            message = "Quotazioni aggiornate con successo"
+            self.logger.info(f"Successfully updated quotes for {ticker}")
+
+            return {"success": True, "ticker": ticker, "message": message}
+
+        except Exception as e:
+            error_message = f"Errore durante l'aggiornamento: {str(e)}"
+            self.logger.error(f"Failed to update quotes for {ticker}: {error_message}")
+            return {"success": False, "ticker": ticker, "message": error_message}
+
+    def update_all_etf_quotes(self) -> dict:
+        """
+        Update quotes for all ETFs (Application Service - Orchestration)
+
+        Returns:
+            Dictionary with overall status and individual results:
+            {
+                'success': bool,
+                'total': int,
+                'success_count': int,
+                'failed_count': int,
+                'failed_etfs': list,
+                'results': list,
+                'message': str
+            }
+        """
+        self.logger.info("Orchestrating bulk quote update for all ETFs")
+
+        # Get all ETFs
+        etfs: list[ETF] = self.get_all()
+        total: int = len(etfs)
+
+        if total == 0:
+            self.logger.warning("No ETFs found in database")
+            return {
+                "success": False,
+                "message": "Nessun ETF trovato nel database",
+                "total": 0,
+                "success_count": 0,
+                "failed_count": 0,
+                "failed_etfs": [],
+                "results": [],
+            }
+
+        self.logger.info(f"Found {total} ETFs to update")
+
+        # Delegate to QuoteService for each ETF
+        results = []
+        success_count = 0
+        failed_etfs = []
+
+        for index, etf in enumerate(etfs, 1):
+            self.logger.info(f"Processing ETF {index}/{total}: {etf.ticker}")
+
+            try:
+                self.quote_service.update_quotes(etf.ticker)
+                message = "Aggiornato"
+                results.append({"success": True, "ticker": etf.ticker, "message": message})
+                success_count += 1
+
+            except Exception as e:
+                error_message = str(e)
+                self.logger.error(f"Failed to update {etf.ticker}: {error_message}")
+                results.append({"success": False, "ticker": etf.ticker, "message": error_message})
+                failed_etfs.append({"ticker": etf.ticker, "name": etf.name, "error": error_message})
+
+        # Prepare summary
+        summary = {
+            "success": len(failed_etfs) == 0,
+            "total": total,
+            "success_count": success_count,
+            "failed_count": len(failed_etfs),
+            "failed_etfs": failed_etfs,
+            "results": results,
         }
-        start_date = period_map.get(period, dt.datetime.now() - relativedelta(years=1))
-        self.logger.debug(f"Calculated start date for period {period}: {start_date.strftime('%Y-%m-%d')}")
 
-        # Query quotes from database
-        quote_daos = (
-            QuoteDAO.query.filter(QuoteDAO.Ticker == ticker, QuoteDAO.Date > start_date.strftime("%Y-%m-%d"))
-            .order_by(QuoteDAO.Date)
-            .all()
-        )
-
-        self.logger.info(f"Retrieved {len(quote_daos)} quotes for ETF {ticker}")
-
-        # Convert DAOs to DTOs
-        return [
-            Quote(
-                ticker=q.Ticker,
-                date=q.Date,
-                open=q.Open,
-                high=q.High,
-                low=q.Low,
-                close=q.Close,
-                volume=q.Volume,
+        if len(failed_etfs) == 0:
+            summary["message"] = f"Tutti i {total} ETF sono stati aggiornati con successo!"
+            self.logger.info(f"Bulk update completed successfully: {success_count}/{total}")
+        else:
+            summary["message"] = f"Aggiornamento completato: {success_count} successi, {len(failed_etfs)} errori"
+            self.logger.warning(
+                f"Bulk update completed with errors: {success_count} success, {len(failed_etfs)} failed"
             )
-            for q in quote_daos
-        ]
+
+        return summary

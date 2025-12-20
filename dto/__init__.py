@@ -4,5 +4,6 @@
 # -----------------------------------------------------------------------------
 from .etf import ETF
 from .quote import Quote
+from .quote_period import QuotePeriod
 
-__all__ = ["ETF", "Quote"]
+__all__ = ["ETF", "Quote", "QuotePeriod"]

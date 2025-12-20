@@ -3,5 +3,6 @@
 # Licensed under the MIT License. See LICENSE.md for details.
 # -----------------------------------------------------------------------------
 from .etf_service import EtfService
+from .quote_service import QuoteService
 
-__all__ = ["EtfService"]
+__all__ = ["EtfService", "QuoteService"]

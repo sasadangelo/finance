@@ -111,7 +111,13 @@
                     <!-- Chart Section -->
                     <div class="row mt-4">
                         <div class="col-md-12">
-                            <h4 class="border-bottom pb-2">Andamento Quotazioni</h4>
+                            <h4 class="border-bottom pb-2">
+                                Andamento Quotazioni
+                                <button id="updateQuotesBtn" class="btn btn-primary btn-sm float-right"
+                                    onclick="updateQuotes()">
+                                    <i class="fas fa-sync-alt"></i> Aggiorna Quotazioni
+                                </button>
+                            </h4>
 
                             <!-- Period Selector -->
                             <div class="btn-group mb-3" role="group" aria-label="Period selector">
@@ -263,5 +269,64 @@
 
     // Load initial chart (1Y)
     loadChart('1Y');
+
+    // Function to update quotes for this ETF
+    async function updateQuotes() {
+        const btn = document.getElementById('updateQuotesBtn');
+        const originalHtml = btn.innerHTML;
+
+        // Disable button and show loading state
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Aggiornamento...';
+
+        try {
+            const response = await fetch(`/etfs/${ticker}/quotes/update`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Show success message
+                showAlert('success', result.message);
+
+                // Reload chart to show new data
+                const activePeriod = document.querySelector('.period-btn.active').getAttribute('data-period');
+                loadChart(activePeriod);
+            } else {
+                showAlert('danger', 'Errore: ' + result.message);
+            }
+        } catch (error) {
+            showAlert('danger', 'Errore durante l\'aggiornamento: ' + error.message);
+        } finally {
+            // Re-enable button
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
+    }
+
+    // Function to show alert messages
+    function showAlert(type, message) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+        alertDiv.role = 'alert';
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        `;
+
+        const cardBody = document.querySelector('.card-body');
+        cardBody.insertBefore(alertDiv, cardBody.firstChild);
+
+        // Auto-dismiss after 5 seconds
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 5000);
+    }
 </script>
 {% endblock %}

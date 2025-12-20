@@ -32,7 +32,7 @@ setup_logging(
 app = Flask(__name__)
 app.config["SECRET_KEY"] = settings.app.secret_key
 app.config["SQLALCHEMY_DATABASE_URI"] = settings.database.get_absolute_uri(project_dir)
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = settings.database.track_modifications
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Initialize db with app
 db.init_app(app)

@@ -13,7 +13,7 @@ from core.log import LoggerManager
 class EtfController:
     """Controller for managing ETF routes"""
 
-    def __init__(self, etf_service: EtfService):
+    def __init__(self, etf_service: EtfService) -> None:
         """
         Initialize EtfController with an EtfService instance
 
@@ -21,19 +21,19 @@ class EtfController:
             etf_service: EtfService instance for business logic
         """
         self.etf_service = etf_service
-        self.logger = LoggerManager.get_logger(self.__class__.__name__)
+        self.logger = LoggerManager.get_logger(name=self.__class__.__name__)
         self.logger.info("EtfController initialized")
 
     def index(self):
         """Display list of all ETFs"""
         self.logger.info("Fetching all ETFs for index page")
-        etfs = self.etf_service.get_all()
+        etfs: list[ETF] = self.etf_service.get_all()
         self.logger.info(f"Retrieved {len(etfs)} ETFs")
-        return render_template("etf/index.html", etfs=etfs)
+        return render_template(template_name_or_list="etf/index.html", etfs=etfs)
 
     def create(self):
         """Display form to create a new ETF"""
-        return render_template("etf/create.html")
+        return render_template(template_name_or_list="etf/create.html")
 
     def store(self):
         """Save a new ETF to database"""
@@ -42,7 +42,7 @@ class EtfController:
 
         try:
             # Create DTO from form data with validation
-            etf_dto = ETF(
+            etf_dto: ETF = ETF(
                 ticker=request.form.get("ticker"),
                 name=request.form.get("name"),
                 isin=request.form.get("isin") or None,
@@ -61,37 +61,37 @@ class EtfController:
             # Call service - exceptions propagate from context manager
             self.etf_service.create(etf_dto)
             self.logger.info(f"ETF {etf_dto.ticker} created successfully")
-            flash(f"ETF {etf_dto.ticker} creato con successo!", "success")
+            flash(message=f"ETF {etf_dto.ticker} creato con successo!", category="success")
 
         except ValidationError as e:
             # Handle Pydantic validation errors
             errors = "; ".join([f"{err['loc'][0]}: {err['msg']}" for err in e.errors()])
             self.logger.warning(f"Validation error creating ETF {ticker}: {errors}")
-            flash(f"Errori di validazione: {errors}", "danger")
+            flash(message=f"Errori di validazione: {errors}", category="danger")
         except SQLAlchemyError as e:
             # Handle database errors (from context manager)
             self.logger.error(f"Database error creating ETF {ticker}: {str(e)}")
-            flash(f"Errore database: {str(e)}", "danger")
+            flash(message=f"Errore database: {str(e)}", category="danger")
         except ValueError as e:
             # Handle business logic errors
             self.logger.warning(f"Business logic error creating ETF {ticker}: {str(e)}")
-            flash(f"Errore: {str(e)}", "danger")
+            flash(message=f"Errore: {str(e)}", category="danger")
         except Exception as e:
             # Catch-all for unexpected errors
             self.logger.exception(f"Unexpected error creating ETF {ticker}: {str(e)}")
-            flash(f"Errore imprevisto: {str(e)}", "danger")
+            flash(message=f"Errore imprevisto: {str(e)}", category="danger")
 
-        return redirect(url_for("etf.index"))
+        return redirect(location=url_for(endpoint="etf.index"))
 
     def edit(self, ticker):
         """Display form to edit an ETF"""
         self.logger.info(f"Fetching ETF {ticker} for editing")
-        etf = self.etf_service.get_by_ticker(ticker)
+        etf: ETF | None = self.etf_service.get_by_ticker(ticker)
         if not etf:
             self.logger.warning(f"ETF {ticker} not found for editing")
-            flash("ETF non trovato", "danger")
-            return redirect(url_for("etf.index"))
-        return render_template("etf/edit.html", etf=etf)
+            flash(message="ETF non trovato", category="danger")
+            return redirect(location=url_for(endpoint="etf.index"))
+        return render_template(template_name_or_list="etf/edit.html", etf=etf)
 
     def update(self, ticker):
         """Update an existing ETF"""
@@ -157,37 +157,10 @@ class EtfController:
     def show(self, ticker):
         """Display ETF details"""
         self.logger.info(f"Fetching ETF {ticker} details")
-        etf = self.etf_service.get_by_ticker(ticker)
+        etf: ETF | None = self.etf_service.get_by_ticker(ticker)
         if not etf:
             self.logger.warning(f"ETF {ticker} not found")
-            flash(f"ETF {ticker} non trovato!", "danger")
-            return redirect(url_for("etf.index"))
+            flash(message=f"ETF {ticker} non trovato!", category="danger")
+            return redirect(location=url_for("etf.index"))
 
-        return render_template("etf/show.html", etf=etf)
-
-    def get_quotes(self, ticker):
-        """Return quote data in JSON format for Chart.js"""
-        from flask import jsonify
-
-        # Get period from query parameter (default 1Y)
-        period = request.args.get("period", "1Y")
-        self.logger.info(f"Fetching quotes for ETF {ticker}, period: {period}")
-
-        try:
-            # Use service layer to get quotes
-            quotes = self.etf_service.get_quotes(ticker, period)
-
-            if not quotes:
-                self.logger.warning(f"No quotes available for ETF {ticker}")
-                return jsonify({"error": "No quotes available"}), 404
-
-            # Format data for Chart.js
-            dates = [quote.date for quote in quotes]
-            prices = [float(quote.close) for quote in quotes]
-
-            self.logger.info(f"Retrieved {len(quotes)} quotes for ETF {ticker}")
-            return jsonify({"labels": dates, "data": prices, "ticker": ticker})
-
-        except Exception as e:
-            self.logger.error(f"Error fetching quotes for ETF {ticker}: {str(e)}")
-            return jsonify({"error": str(e)}), 500
+        return render_template(template_name_or_list="etf/show.html", etf=etf)
