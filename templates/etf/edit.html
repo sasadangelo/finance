@@ -91,6 +91,32 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
+                                    <label for="assetType">Tipo Asset</label>
+                                    <select class="form-control" id="assetType" name="assetType">
+                                        <option value="">Seleziona...</option>
+                                        <option value="EQUITY" {% if etf.assetType and etf.assetType.value=='EQUITY'
+                                            %}selected{% endif %}>Azionario</option>
+                                        <option value="BOND" {% if etf.assetType and etf.assetType.value=='BOND'
+                                            %}selected{% endif %}>Obbligazionario</option>
+                                        <option value="PRECIOUS_METALS" {% if etf.assetType and
+                                            etf.assetType.value=='PRECIOUS_METALS' %}selected{% endif %}>Metalli
+                                            Preziosi</option>
+                                        <option value="COMMODITIES" {% if etf.assetType and
+                                            etf.assetType.value=='COMMODITIES' %}selected{% endif %}>Materie Prime
+                                        </option>
+                                        <option value="CRYPTOCURRENCY" {% if etf.assetType and
+                                            etf.assetType.value=='CRYPTOCURRENCY' %}selected{% endif %}>Criptovalute
+                                        </option>
+                                        <option value="REAL_ESTATE" {% if etf.assetType and
+                                            etf.assetType.value=='REAL_ESTATE' %}selected{% endif %}>Immobiliare
+                                        </option>
+                                        <option value="MONEY_MARKET" {% if etf.assetType and
+                                            etf.assetType.value=='MONEY_MARKET' %}selected{% endif %}>Monetario</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
                                     <label for="dividendType">Tipo Dividendo *</label>
                                     <select class="form-control" id="dividendType" name="dividendType" required>
                                         <option value="">Seleziona...</option>
@@ -101,6 +127,9 @@
                                     </select>
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="dividendFrequency">Frequenza Dividendo</label>

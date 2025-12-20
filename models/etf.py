@@ -19,6 +19,7 @@ class EtfDAO(db.Model):
     dividendType = db.Column(db.String(20), nullable=False)
 
     # Optional fields (can be NULL)
+    assetType = db.Column(db.String(30))
     dividendFrequency = db.Column(db.Integer)
     yeld = db.Column(db.Float)
     capital = db.Column(db.Float)

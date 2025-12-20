@@ -39,6 +39,17 @@ class EtfController:
         Raises:
             ValidationError: If Pydantic validation fails
         """
+        from dto import ETFAssetType
+
+        # Parse assetType from form
+        asset_type_str = request.form.get("assetType")
+        asset_type = None
+        if asset_type_str:
+            try:
+                asset_type = ETFAssetType(asset_type_str)
+            except ValueError:
+                asset_type = None
+
         return ETF(
             ticker=ticker or cast(str, request.form.get("ticker")),
             name=cast(str, request.form.get("name")),
@@ -49,6 +60,7 @@ class EtfController:
             volatility=float(volatility_str) if (volatility_str := request.form.get("volatility")) else None,
             currency=cast(str, request.form.get("currency") or None),
             dividendType=request.form.get("dividendType") or None,
+            assetType=asset_type,
             dividendFrequency=int(freq_str) if (freq_str := request.form.get("dividendFrequency")) else None,
             yeld=float(yeld_str) if (yeld_str := request.form.get("yeld")) else None,
         )

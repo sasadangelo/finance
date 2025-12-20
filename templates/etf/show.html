@@ -42,6 +42,23 @@
                                     <td>{{ etf.launchDate or '-' }}</td>
                                 </tr>
                                 <tr>
+                                    <th>Tipo Asset:</th>
+                                    <td>
+                                        {% if etf.assetType %}
+                                        {% if etf.assetType.value == 'EQUITY' %}Azionario
+                                        {% elif etf.assetType.value == 'BOND' %}Obbligazionario
+                                        {% elif etf.assetType.value == 'PRECIOUS_METALS' %}Metalli Preziosi
+                                        {% elif etf.assetType.value == 'COMMODITIES' %}Materie Prime
+                                        {% elif etf.assetType.value == 'CRYPTOCURRENCY' %}Criptovalute
+                                        {% elif etf.assetType.value == 'REAL_ESTATE' %}Immobiliare
+                                        {% elif etf.assetType.value == 'MONEY_MARKET' %}Monetario
+                                        {% else %}{{ etf.assetType.value }}
+                                        {% endif %}
+                                        {% else %}-
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
                                     <th>Valuta:</th>
                                     <td>{{ etf.currency or '-' }}</td>
                                 </tr>

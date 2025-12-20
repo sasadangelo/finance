@@ -12,6 +12,3 @@ class ErrorResponse(BaseModel):
 
     class Config:
         json_schema_extra = {"example": {"error": "No quotes available"}}
-
-
-# Made with Bob

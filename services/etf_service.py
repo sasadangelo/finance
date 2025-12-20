@@ -52,7 +52,7 @@ class EtfService:
             ETF DTO if found, None otherwise
         """
         self.logger.debug(f"Fetching ETF with ticker: {ticker}")
-        etf_dao = EtfDAO.query.get(ticker)
+        etf_dao = EtfDAO.query.get(ident=ticker)
         if etf_dao:
             self.logger.debug(f"ETF {ticker} found in database")
             return ETF.model_validate(etf_dao)
@@ -84,6 +84,7 @@ class EtfService:
             etf_dao.dividendType = etf_dto.dividendType
             etf_dao.dividendFrequency = etf_dto.dividendFrequency
             etf_dao.yeld = etf_dto.yeld
+            etf_dao.assetType = etf_dto.assetType.value if etf_dto.assetType else None
             session.add(instance=etf_dao)
             self.logger.info(f"ETF {etf_dto.ticker} created successfully in database")
 
@@ -116,6 +117,7 @@ class EtfService:
             etf_dao.dividendType = etf_dto.dividendType
             etf_dao.dividendFrequency = etf_dto.dividendFrequency
             etf_dao.yeld = etf_dto.yeld
+            etf_dao.assetType = etf_dto.assetType.value if etf_dto.assetType else None
             self.logger.info(f"ETF {etf_dto.ticker} updated successfully in database")
 
     def delete(self, ticker: str) -> None:

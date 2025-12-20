@@ -3,6 +3,7 @@
 # Licensed under the MIT License. See LICENSE.md for details.
 # -----------------------------------------------------------------------------
 from pydantic import BaseModel, Field, field_validator
+from dto.etf_asset_type import ETFAssetType
 
 
 class ETF(BaseModel):
@@ -20,6 +21,7 @@ class ETF(BaseModel):
     dividendType: str | None = Field(None, max_length=20, description="Dividend type (Distribuzione/Accumulazione)")
 
     # Optional fields
+    assetType: ETFAssetType | None = Field(None, description="Asset type")
     dividendFrequency: int | None = Field(None, ge=1, le=12, description="Dividend frequency")
     yeld: float | None = Field(None, ge=0, le=100, description="Yield percentage")
     capital: float | None = Field(None, ge=0, description="Capital in millions")

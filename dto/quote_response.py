@@ -20,6 +20,3 @@ class QuoteResponse(BaseModel):
                 "data": [100.5, 101.2, 102.0],
             }
         }
-
-
-# Made with Bob

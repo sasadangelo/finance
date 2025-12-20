@@ -90,6 +90,21 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
+                                    <label for="assetType">Tipo Asset</label>
+                                    <select class="form-control" id="assetType" name="assetType">
+                                        <option value="">Seleziona...</option>
+                                        <option value="EQUITY">Azionario</option>
+                                        <option value="BOND">Obbligazionario</option>
+                                        <option value="PRECIOUS_METALS">Metalli Preziosi</option>
+                                        <option value="COMMODITIES">Materie Prime</option>
+                                        <option value="CRYPTOCURRENCY">Criptovalute</option>
+                                        <option value="REAL_ESTATE">Immobiliare</option>
+                                        <option value="MONEY_MARKET">Monetario</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
                                     <label for="dividendType">Tipo Dividendo *</label>
                                     <select class="form-control" id="dividendType" name="dividendType" required>
                                         <option value="">Seleziona...</option>
@@ -98,6 +113,9 @@
                                     </select>
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="dividendFrequency">Frequenza Dividendo</label>
