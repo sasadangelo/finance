@@ -7,6 +7,7 @@ from typing import Protocol, TYPE_CHECKING
 if TYPE_CHECKING:
     from controllers.etf_controller import EtfController
     from controllers.quote_controller import QuoteController
+    from controllers.index_controller import IndexController
 
 
 # Protocol for type-safe access to controllers attached to Flask app
@@ -15,6 +16,4 @@ class ApplicationContainer(Protocol):
 
     etf_controller: "EtfController"
     quote_controller: "QuoteController"
-
-
-# Made with Bob
+    index_controller: "IndexController"

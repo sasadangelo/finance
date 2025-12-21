@@ -8,7 +8,9 @@ Handles initialization of services and controllers using the init_app pattern.
 """
 from core.database import DatabaseManager
 from controllers import QuoteController, EtfController
+from controllers.index_controller import IndexController
 from services import EtfService, QuoteService
+from services.index_service import IndexService
 
 
 def init_app(app, db):
@@ -31,12 +33,15 @@ def init_app(app, db):
     # Initialize Services (Domain Services first, then Application Services)
     quote_service: QuoteService = QuoteService(db_manager)
     etf_service: EtfService = EtfService(db_manager, quote_service)
+    index_service: IndexService = IndexService(db_manager)
 
     # Initialize Controllers (Presentation Layer)
-    etf_controller: EtfController = EtfController(etf_service)
+    etf_controller: EtfController = EtfController(etf_service, index_service)
     quote_controller: QuoteController = QuoteController(quote_service, etf_service)
+    index_controller: IndexController = IndexController(index_service)
 
     # Attach controllers to app instance
-    # This allows access via current_app.etf_controller and current_app.quote_controller in routes
+    # This allows access via current_app in routes
     app.etf_controller = etf_controller
     app.quote_controller = quote_controller
+    app.index_controller = index_controller

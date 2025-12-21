@@ -8,5 +8,16 @@ from .quote import Quote
 from .quote_period import QuotePeriod
 from .quote_response import QuoteResponse
 from .error_response import ErrorResponse
+from .index import Index
+from .etf_screener_filters import ETFScreenerFilters
 
-__all__ = ["ETF", "ETFAssetType", "Quote", "QuotePeriod", "QuoteResponse", "ErrorResponse"]
+__all__ = [
+    "ETF",
+    "ETFAssetType",
+    "Quote",
+    "QuotePeriod",
+    "QuoteResponse",
+    "ErrorResponse",
+    "Index",
+    "ETFScreenerFilters",
+]

@@ -27,6 +27,7 @@ class ETF(BaseModel):
     capital: float | None = Field(None, ge=0, description="Capital in millions")
     replication: str | None = Field(None, max_length=100, description="Replication type")
     volatility: float | None = Field(None, ge=0, le=100, description="Volatility percentage")
+    indexTicker: str | None = Field(None, max_length=10, description="Reference index ticker")
 
     @field_validator("ticker")
     @classmethod

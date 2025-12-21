@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Dettagli Indice{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h2 class="mb-0">Dettagli Indice: {{ index.ticker }}</h2>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <tbody>
+                            <tr>
+                                <th style="width: 30%;">Ticker</th>
+                                <td><strong>{{ index.ticker }}</strong></td>
+                            </tr>
+                            <tr>
+                                <th>Nome</th>
+                                <td>{{ index.name }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="mt-4">
+                        <a href="{{ url_for('index.edit', ticker=index.ticker) }}" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Modifica
+                        </a>
+                        <a href="{{ url_for('index.index') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Torna alla Lista
+                        </a>
+                        <form action="{{ url_for('index.delete', ticker=index.ticker) }}" method="POST"
+                            style="display:inline;"
+                            onsubmit="return confirm('Sei sicuro di voler eliminare questo indice?');">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Elimina
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

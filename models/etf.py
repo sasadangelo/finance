@@ -25,6 +25,10 @@ class EtfDAO(db.Model):
     capital = db.Column(db.Float)
     replication = db.Column(db.String(30))
     volatility = db.Column(db.Float)
+    indexTicker = db.Column(db.String(10), db.ForeignKey("indices.ticker"), nullable=True)
+
+    # Relationship to Index
+    index = db.relationship("IndexDAO", backref="etfs", lazy=True)
 
     def __repr__(self):
         return f"<EtfDAO {self.ticker}: {self.name}>"

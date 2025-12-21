@@ -328,6 +328,10 @@ class EtfService:
         if filters.replication and (not etf.replication or etf.replication != filters.replication):
             return False
 
+        # Index filter
+        if filters.index_ticker and etf.indexTicker != filters.index_ticker:
+            return False
+
         # Fund size filter
         if filters.min_capital is not None and (not etf.capital or etf.capital < filters.min_capital):
             return False

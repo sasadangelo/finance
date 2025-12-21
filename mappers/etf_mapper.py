@@ -37,6 +37,7 @@ class EtfMapper:
         dao.dividendFrequency = etf_dto.dividendFrequency
         dao.yeld = etf_dto.yeld
         dao.assetType = etf_dto.assetType.value if etf_dto.assetType else None
+        dao.indexTicker = etf_dto.indexTicker
 
         return dao
 
