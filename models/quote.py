@@ -10,7 +10,12 @@ class QuoteDAO(db.Model):
 
     __tablename__ = "quotes"
 
-    Ticker = db.Column(db.String(10), primary_key=True, nullable=False)
+    Ticker = db.Column(
+        db.String(10),
+        db.ForeignKey("etfs.ticker", ondelete="CASCADE"),
+        primary_key=True,
+        nullable=False,
+    )
     Date = db.Column(db.String(20), primary_key=True, nullable=False)
     Open = db.Column(db.Float)
     High = db.Column(db.Float)
