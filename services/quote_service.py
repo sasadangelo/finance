@@ -58,7 +58,7 @@ class QuoteService:
         self.logger.info(f"Retrieved {len(quote_daos)} quotes for ETF {ticker}")
 
         # Convert DAOs to DTOs using Pydantic's model_validate
-        return [Quote.model_validate(dao) for dao in quote_daos]
+        return [Quote.model_validate(obj=dao) for dao in quote_daos]
 
     def update_quotes(self, ticker: str) -> None:
         """
@@ -79,7 +79,7 @@ class QuoteService:
             return  # Already up to date
 
         # Download quotes from yfinance
-        self.logger.debug(f"Downloading quotes from {start_date.date()} to {self.end_date.date()}")
+        self.logger.info(f"Downloading quotes from {start_date.date()} to {self.end_date.date()}")
         raw_df: DataFrame | None = yf.download(
             tickers=ticker,
             start=start_date,
@@ -122,7 +122,7 @@ class QuoteService:
             start_date: datetime = last_quote_date + dt.timedelta(days=1)
 
             # Already up to date
-            if start_date > self.end_date:
+            if start_date >= self.end_date:
                 self.logger.info(f"  Already up to date (last quote: {last_quote_date.date()})")
                 return None
 
@@ -141,9 +141,10 @@ class QuoteService:
         """
         from core.database import db
         import pandas as pd
+        from pandas import DataFrame as PandasDataFrame
 
         # Reset index to get Date as a column
-        df: DataFrame = raw_df.reset_index()
+        df: PandasDataFrame = raw_df.reset_index()
 
         # Flatten MultiIndex columns if present (yfinance returns MultiIndex for single ticker)
         if isinstance(df.columns, pd.MultiIndex):
@@ -153,20 +154,72 @@ class QuoteService:
         df["Ticker"] = ticker
         df["Date"] = pd.to_datetime(df["Date"]).dt.strftime("%Y-%m-%d")
 
-        # Handle NaN values using pandas methods (more efficient than apply)
-        df["Open"] = df["Open"].replace([float("inf"), float("-inf")], None).round(2)
-        df["High"] = df["High"].replace([float("inf"), float("-inf")], None).round(2)
-        df["Low"] = df["Low"].replace([float("inf"), float("-inf")], None).round(2)
-        df["Close"] = df["Close"].replace([float("inf"), float("-inf")], None).round(2)
-        df["Adj_Close"] = df["Adj Close"].replace([float("inf"), float("-inf")], None).round(2)
-        df["Volume"] = df["Volume"].replace([float("inf"), float("-inf")], None).astype("Int64")
+        # Filter out dates that already exist in the database
+        df = self._filter_existing_quotes(ticker, df)
 
-        # Select only the columns we need
-        quotes_df = df[["Ticker", "Date", "Open", "High", "Low", "Close", "Adj_Close", "Volume"]].copy()
+        # If no new quotes to insert, return early
+        if df.empty:
+            self.logger.info("  No new quotes to insert (all dates already exist)")
+            return
+
+        # Prepare data for insertion
+        quotes_df = self._prepare_quotes_dataframe(df)
 
         # Bulk insert using pandas to_sql
         with self.db_manager.get_session():
             quotes_df.to_sql(name="quotes", con=db.engine, if_exists="append", index=False)
+
+    def _filter_existing_quotes(self, ticker: str, df: DataFrame) -> DataFrame:
+        """
+        Filter out quotes that already exist in the database
+
+        Args:
+            ticker: ETF ticker symbol
+            df: DataFrame with quote data
+
+        Returns:
+            Filtered DataFrame without existing quotes
+        """
+        from pandas import DataFrame as PandasDataFrame
+
+        existing_dates = [
+            row.Date
+            for row in QuoteDAO.query.filter(QuoteDAO.Ticker == ticker, QuoteDAO.Date.in_(df["Date"].tolist())).all()
+        ]
+
+        if existing_dates:
+            self.logger.debug(f"Filtering out {len(existing_dates)} existing quotes")
+            filtered_df = df[~df["Date"].isin(existing_dates)]
+            return PandasDataFrame(data=filtered_df)
+
+        return df
+
+    def _prepare_quotes_dataframe(self, df: DataFrame) -> DataFrame:
+        """
+        Prepare DataFrame for database insertion by handling NaN values and selecting columns
+
+        Args:
+            df: DataFrame with quote data
+
+        Returns:
+            Prepared DataFrame ready for database insertion
+        """
+        from pandas import DataFrame as PandasDataFrame
+
+        # Handle NaN and infinite values for price columns
+        price_columns: list[str] = ["Open", "High", "Low", "Close"]
+        for col in price_columns:
+            df[col] = df[col].replace([float("inf"), float("-inf")], None).round(2)
+
+        # Handle Adj Close separately due to different column name
+        df["Adj_Close"] = df["Adj Close"].replace([float("inf"), float("-inf")], None).round(2)
+
+        # Handle Volume as integer
+        df["Volume"] = df["Volume"].replace([float("inf"), float("-inf")], None).astype("Int64")
+
+        # Select only the columns we need
+        result = df[["Ticker", "Date", "Open", "High", "Low", "Close", "Adj_Close", "Volume"]].copy()
+        return PandasDataFrame(result)
 
     def _safe_float(self, value: Any) -> float | None:
         """
