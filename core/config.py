@@ -54,6 +54,14 @@ class LogConfig(BaseSettings):
     compression: str = Field(default="zip", description="Compression format for rotated logs")
 
 
+class CronConfig(BaseSettings):
+    """Cron job configuration"""
+
+    quotes_crontab: str = Field(
+        default="0 23 * * 1-5", description="Cron expression for quotes update (default: 11 PM Mon-Fri)"
+    )
+
+
 class Settings(BaseSettings):
     """
     Main application settings.
@@ -64,6 +72,7 @@ class Settings(BaseSettings):
     app: AppConfig
     database: DatabaseConfig
     log: LogConfig
+    cron: CronConfig
 
     @classmethod
     def from_yaml(cls, config_path: str | Path = "config.yml") -> "Settings":
@@ -98,6 +107,7 @@ class Settings(BaseSettings):
         app_data = config_data.get("app", {})
         db_data = config_data.get("database", {})
         log_data = config_data.get("log", {})
+        cron_data = config_data.get("cron", {})
 
         # Add secret_key to app config
         app_data["secret_key"] = secret_key
@@ -110,7 +120,12 @@ class Settings(BaseSettings):
         db_data.pop("track_modifications", None)
 
         # Create and return Settings with all defaults applied by Pydantic
-        return cls(app=AppConfig(**app_data), database=DatabaseConfig(**db_data), log=LogConfig(**log_data))
+        return cls(
+            app=AppConfig(**app_data),
+            database=DatabaseConfig(**db_data),
+            log=LogConfig(**log_data),
+            cron=CronConfig(**cron_data),
+        )
 
 
 @lru_cache

@@ -29,7 +29,7 @@
                         </button>
                     </div>
 
-                    <div id="filterPanel" style="{% if not has_filters %}display: none;{% endif %}">
+                    <div id="filterPanel" {% if not has_filters %}style="display: none;" {% endif %}>
                         <div class="card mb-4">
                             <div class="card-header bg-light">
                                 <h5 class="mb-0">

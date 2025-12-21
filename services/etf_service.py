@@ -227,7 +227,7 @@ class EtfService:
             Dictionary with update result
         """
         try:
-            self.quote_service.update_quotes(etf.ticker)
+            self.quote_service.update_quotes(ticker=etf.ticker)
             return {"success": True, "ticker": etf.ticker, "message": "Aggiornato"}
         except Exception as e:
             error_message = str(e)

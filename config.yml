@@ -10,6 +10,11 @@ app:
 
 database:
   relative_path: "database/etfs.db"
+
+# Cron job configuration
+cron:
+  quotes_crontab: "0 23 * * 1-5" # Run at 11 PM Monday to Friday (excluding weekends)
+
 # Logging configuration (all parameters are optional with defaults)
 # log:
 #   level: "INFO"              # Default: INFO (DEBUG, INFO, WARNING, ERROR, CRITICAL)

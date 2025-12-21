@@ -4,18 +4,16 @@
 # -----------------------------------------------------------------------------
 """
 Application bootstrap module.
-Handles initialization of services and controllers using the init_app pattern.
+Handles initialization of services, controllers, and cron jobs using the init_app pattern.
 """
 from core.database import DatabaseManager
-from controllers import QuoteController, EtfController
-from controllers.index_controller import IndexController
-from services import EtfService, QuoteService
-from services.index_service import IndexService
+from controllers import QuoteController, EtfController, IndexController
+from services import EtfService, QuoteService, UpdateQuotesCronJob, IndexService
 
 
-def init_app(app, db):
+def init_app(app, db) -> None:
     """
-    Initialize application with all services and controllers.
+    Initialize application with all services, controllers, and cron jobs.
 
     This function follows the Flask extension pattern (init_app),
     allowing for flexible application factory setup.
@@ -28,7 +26,7 @@ def init_app(app, db):
         None (modifies app in place by adding attributes)
     """
     # Initialize DatabaseManager
-    db_manager: DatabaseManager = DatabaseManager(db)
+    db_manager: DatabaseManager = DatabaseManager(db_instance=db)
 
     # Initialize Services (Domain Services first, then Application Services)
     quote_service: QuoteService = QuoteService(db_manager)
@@ -40,8 +38,14 @@ def init_app(app, db):
     quote_controller: QuoteController = QuoteController(quote_service, etf_service)
     index_controller: IndexController = IndexController(index_service)
 
+    # Initialize Cron Jobs (pass app for context)
+    update_quotes_cronjob: UpdateQuotesCronJob = UpdateQuotesCronJob(db_manager, app)
+
     # Attach controllers to app instance
     # This allows access via current_app in routes
     app.etf_controller = etf_controller
     app.quote_controller = quote_controller
     app.index_controller = index_controller
+
+    # Attach cron job to app instance
+    app.update_quotes_cronjob = update_quotes_cronjob
