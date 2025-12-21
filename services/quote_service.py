@@ -158,10 +158,11 @@ class QuoteService:
         df["High"] = df["High"].replace([float("inf"), float("-inf")], None).round(2)
         df["Low"] = df["Low"].replace([float("inf"), float("-inf")], None).round(2)
         df["Close"] = df["Close"].replace([float("inf"), float("-inf")], None).round(2)
+        df["Adj_Close"] = df["Adj Close"].replace([float("inf"), float("-inf")], None).round(2)
         df["Volume"] = df["Volume"].replace([float("inf"), float("-inf")], None).astype("Int64")
 
         # Select only the columns we need
-        quotes_df = df[["Ticker", "Date", "Open", "High", "Low", "Close", "Volume"]].copy()
+        quotes_df = df[["Ticker", "Date", "Open", "High", "Low", "Close", "Adj_Close", "Volume"]].copy()
 
         # Bulk insert using pandas to_sql
         with self.db_manager.get_session():

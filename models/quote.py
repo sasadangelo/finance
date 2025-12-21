@@ -16,6 +16,7 @@ class QuoteDAO(db.Model):
     High = db.Column(db.Float)
     Low = db.Column(db.Float)
     Close = db.Column(db.Float, nullable=False)
+    Adj_Close = db.Column(db.Float)
     Volume = db.Column(db.Integer)
 
     def __repr__(self):

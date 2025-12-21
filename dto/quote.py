@@ -14,6 +14,7 @@ class Quote(BaseModel):
     high: float | None = Field(None, ge=0, alias="High")
     low: float | None = Field(None, ge=0, alias="Low")
     close: float = Field(..., ge=0, alias="Close")
+    adj_close: float | None = Field(None, ge=0, alias="Adj_Close")
     volume: int | None = Field(None, ge=0, alias="Volume")
 
     model_config = ConfigDict(from_attributes=True, populate_by_name=True)
