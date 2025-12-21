@@ -143,7 +143,7 @@ class QuoteService:
         import pandas as pd
 
         # Reset index to get Date as a column
-        df = raw_df.reset_index()
+        df: DataFrame = raw_df.reset_index()
 
         # Flatten MultiIndex columns if present (yfinance returns MultiIndex for single ticker)
         if isinstance(df.columns, pd.MultiIndex):
@@ -179,8 +179,8 @@ class QuoteService:
             Rounded float value or None if conversion fails or value is NaN
         """
         try:
-            float_val = float(value)
-            return round(float_val, 2) if not math.isnan(float_val) else None
+            float_val: float = float(value)
+            return round(number=float_val, ndigits=2) if not math.isnan(float_val) else None
         except (ValueError, TypeError):
             return None
 
