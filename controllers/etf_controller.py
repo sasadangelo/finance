@@ -6,7 +6,7 @@ from typing import cast
 from flask import render_template, request, redirect, url_for, flash
 from core import LoggerManager
 from controllers.types import WebResponse
-from dto import ETF, ETFAssetType, Index, ETFScreenerFilters
+from dto import ETF, ETFAssetType, ETFCurrency, ETFReplicationType, Index, ETFScreenerFilters
 from pydantic import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 from services import EtfService
@@ -28,6 +28,56 @@ class EtfController:
         self.index_service = index_service
         self.logger = LoggerManager.get_logger(name=self.__class__.__name__)
         self.logger.info("EtfController initialized")
+
+    def _convert_date_to_italian(self, date_str: str) -> str:
+        """
+        Convert date from yyyy-mm-dd (HTML date input) to dd/mm/yyyy (Italian format)
+
+        Args:
+            date_str: Date in yyyy-mm-dd format
+
+        Returns:
+            Date in dd/mm/yyyy format
+        """
+        if not date_str or "/" in date_str:
+            # Already in Italian format or empty
+            return date_str
+
+        try:
+            # Parse yyyy-mm-dd
+            parts = date_str.split("-")
+            if len(parts) == 3:
+                year, month, day = parts
+                return f"{day}/{month}/{year}"
+        except Exception:
+            pass
+
+        return date_str
+
+    def _convert_date_to_html(self, date_str: str) -> str:
+        """
+        Convert date from dd/mm/yyyy (Italian format) to yyyy-mm-dd (HTML date input)
+
+        Args:
+            date_str: Date in dd/mm/yyyy format
+
+        Returns:
+            Date in yyyy-mm-dd format
+        """
+        if not date_str or "-" in date_str:
+            # Already in HTML format or empty
+            return date_str
+
+        try:
+            # Parse dd/mm/yyyy
+            parts = date_str.split("/")
+            if len(parts) == 3:
+                day, month, year = parts
+                return f"{year}-{month}-{day}"
+        except Exception:
+            pass
+
+        return date_str
 
     def _parse_form_data(self, ticker: str | None = None) -> ETF:
         """
@@ -51,15 +101,37 @@ class EtfController:
             except ValueError:
                 asset_type = None
 
+        # Parse currency from form (required field)
+        currency_str: str | None = request.form.get("currency")
+        if not currency_str:
+            raise ValueError("Currency is required")
+        try:
+            currency: ETFCurrency = ETFCurrency(currency_str)
+        except ValueError:
+            raise ValueError(f"Invalid currency: {currency_str}")
+
+        # Parse replication from form
+        replication_str: str | None = request.form.get("replication")
+        replication: ETFReplicationType | None = None
+        if replication_str:
+            try:
+                replication = ETFReplicationType(replication_str)
+            except ValueError:
+                replication = None
+
+        # Get and convert launch date from HTML format to Italian format
+        launch_date_html = request.form.get("launchDate")
+        launch_date = self._convert_date_to_italian(launch_date_html) if launch_date_html else None
+
         return ETF(
             ticker=ticker or cast(str, request.form.get("ticker")),
             name=cast(str, request.form.get("name")),
             isin=cast(str, request.form.get("isin") or None),
-            launchDate=cast(str, request.form.get("launchDate") or None),
+            launchDate=cast(str, launch_date or None),
             capital=float(capital_str) if (capital_str := request.form.get("capital")) else None,
-            replication=request.form.get("replication") or None,
+            replication=replication,
             volatility=float(volatility_str) if (volatility_str := request.form.get("volatility")) else None,
-            currency=cast(str, request.form.get("currency") or None),
+            currency=currency,
             dividendType=request.form.get("dividendType") or None,
             assetType=asset_type,
             dividendFrequency=int(freq_str) if (freq_str := request.form.get("dividendFrequency")) else None,
@@ -187,9 +259,15 @@ class EtfController:
             self.logger.warning(f"ETF {ticker} not found for editing")
             flash(message="ETF non trovato", category="danger")
             return redirect(location=url_for(endpoint="etf.index"))
+
+        # Convert launch date to HTML format for date input
+        etf_dict = etf.model_dump()
+        if etf_dict.get("launchDate"):
+            etf_dict["launchDate"] = self._convert_date_to_html(etf_dict["launchDate"])
+
         # Get all indices for dropdown
         indices: list[Index] = self.index_service.get_all()
-        return render_template(template_name_or_list="etf/edit.html", etf=etf, indices=indices)
+        return render_template(template_name_or_list="etf/edit.html", etf=etf_dict, indices=indices, etf_obj=etf)
 
     def update(self, ticker: str) -> WebResponse:
         """Update an existing ETF"""

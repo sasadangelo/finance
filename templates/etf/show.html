@@ -60,11 +60,11 @@
                                 </tr>
                                 <tr>
                                     <th>Valuta:</th>
-                                    <td>{{ etf.currency or '-' }}</td>
+                                    <td>{{ etf.currency.value if etf.currency else '-' }}</td>
                                 </tr>
                                 <tr>
                                     <th>Replica:</th>
-                                    <td>{{ etf.replication or '-' }}</td>
+                                    <td>{{ etf.replication.value if etf.replication else '-' }}</td>
                                 </tr>
                                 <tr>
                                     <th>Indice di Riferimento:</th>

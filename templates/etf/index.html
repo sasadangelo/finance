@@ -229,7 +229,7 @@
                                 <td><strong>{{ etf.ticker }}</strong></td>
                                 <td>{{ etf.name }}</td>
                                 <td>{{ etf.isin or '-' }}</td>
-                                <td>{{ etf.currency or '-' }}</td>
+                                <td>{{ etf.currency.value if etf.currency else '-' }}</td>
                                 <td>{{ etf.volatility or '-' }}</td>
                                 <td>
                                     <a href="{{ url_for('etf.show', ticker=etf.ticker) }}" class="btn btn-info btn-sm"

@@ -30,9 +30,9 @@ class EtfMapper:
         dao.isin = etf_dto.isin
         dao.launchDate = etf_dto.launchDate
         dao.capital = etf_dto.capital
-        dao.replication = etf_dto.replication
+        dao.replication = etf_dto.replication.value if etf_dto.replication else None
         dao.volatility = etf_dto.volatility
-        dao.currency = etf_dto.currency
+        dao.currency = etf_dto.currency.value
         dao.dividendType = etf_dto.dividendType
         dao.dividendFrequency = etf_dto.dividendFrequency
         dao.yeld = etf_dto.yeld

@@ -40,8 +40,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="launchDate">Data Lancio *</label>
-                                    <input type="text" class="form-control" id="launchDate" name="launchDate" required
-                                        maxlength="20" placeholder="es. 22 maggio 2012">
+                                    <input type="date" class="form-control" id="launchDate" name="launchDate" required>
                                 </div>
                             </div>
                         </div>
@@ -74,15 +73,23 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="currency">Valuta *</label>
-                                    <input type="text" class="form-control" id="currency" name="currency" required
-                                        maxlength="10" placeholder="es. USD">
+                                    <select class="form-control" id="currency" name="currency" required>
+                                        <option value="">Seleziona...</option>
+                                        <option value="USD">USD</option>
+                                        <option value="EUR">EUR</option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="replication">Replica</label>
-                                    <input type="text" class="form-control" id="replication" name="replication"
-                                        maxlength="30" placeholder="es. Fisica (Replica totale)">
+                                    <select class="form-control" id="replication" name="replication">
+                                        <option value="">Seleziona...</option>
+                                        <option value="Fisica (Replica totale)">Fisica (Replica totale)</option>
+                                        <option value="Fisica (Campionamento)">Fisica (Campionamento)</option>
+                                        <option value="Sintetica">Sintetica</option>
+                                        <option value="Ibrida">Ibrida</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>

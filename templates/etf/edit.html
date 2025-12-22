@@ -41,8 +41,8 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="launchDate">Data Lancio *</label>
-                                    <input type="text" class="form-control" id="launchDate" name="launchDate" required
-                                        maxlength="20" value="{{ etf.launchDate or '' }}">
+                                    <input type="date" class="form-control" id="launchDate" name="launchDate" required
+                                        value="{{ etf.launchDate or '' }}">
                                 </div>
                             </div>
                         </div>
@@ -75,15 +75,33 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="currency">Valuta *</label>
-                                    <input type="text" class="form-control" id="currency" name="currency" required
-                                        maxlength="10" value="{{ etf.currency or '' }}">
+                                    <select class="form-control" id="currency" name="currency" required>
+                                        <option value="">Seleziona...</option>
+                                        <option value="USD" {% if etf.currency and etf.currency.value=='USD'
+                                            %}selected{% endif %}>USD</option>
+                                        <option value="EUR" {% if etf.currency and etf.currency.value=='EUR'
+                                            %}selected{% endif %}>EUR</option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="replication">Replica</label>
-                                    <input type="text" class="form-control" id="replication" name="replication"
-                                        maxlength="30" value="{{ etf.replication or '' }}">
+                                    <select class="form-control" id="replication" name="replication">
+                                        <option value="">Seleziona...</option>
+                                        <option value="Fisica (Replica totale)" {% if etf_obj.replication and
+                                            etf_obj.replication.value=='Fisica (Replica totale)' %}selected{% endif %}>
+                                            Fisica (Replica totale)</option>
+                                        <option value="Fisica (Campionamento)" {% if etf_obj.replication and
+                                            etf_obj.replication.value=='Fisica (Campionamento)' %}selected{% endif %}>
+                                            Fisica
+                                            (Campionamento)</option>
+                                        <option value="Sintetica" {% if etf_obj.replication and
+                                            etf_obj.replication.value=='Sintetica' %}selected{% endif %}>Sintetica
+                                        </option>
+                                        <option value="Ibrida" {% if etf_obj.replication and
+                                            etf_obj.replication.value=='Ibrida' %}selected{% endif %}>Ibrida</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -94,24 +112,25 @@
                                     <label for="assetType">Tipo Asset</label>
                                     <select class="form-control" id="assetType" name="assetType">
                                         <option value="">Seleziona...</option>
-                                        <option value="EQUITY" {% if etf.assetType and etf.assetType.value=='EQUITY'
-                                            %}selected{% endif %}>Azionario</option>
-                                        <option value="BOND" {% if etf.assetType and etf.assetType.value=='BOND'
+                                        <option value="EQUITY" {% if etf_obj.assetType and
+                                            etf_obj.assetType.value=='EQUITY' %}selected{% endif %}>Azionario</option>
+                                        <option value="BOND" {% if etf_obj.assetType and etf_obj.assetType.value=='BOND'
                                             %}selected{% endif %}>Obbligazionario</option>
-                                        <option value="PRECIOUS_METALS" {% if etf.assetType and
-                                            etf.assetType.value=='PRECIOUS_METALS' %}selected{% endif %}>Metalli
+                                        <option value="PRECIOUS_METALS" {% if etf_obj.assetType and
+                                            etf_obj.assetType.value=='PRECIOUS_METALS' %}selected{% endif %}>Metalli
                                             Preziosi</option>
-                                        <option value="COMMODITIES" {% if etf.assetType and
-                                            etf.assetType.value=='COMMODITIES' %}selected{% endif %}>Materie Prime
+                                        <option value="COMMODITIES" {% if etf_obj.assetType and
+                                            etf_obj.assetType.value=='COMMODITIES' %}selected{% endif %}>Materie Prime
                                         </option>
-                                        <option value="CRYPTOCURRENCY" {% if etf.assetType and
-                                            etf.assetType.value=='CRYPTOCURRENCY' %}selected{% endif %}>Criptovalute
+                                        <option value="CRYPTOCURRENCY" {% if etf_obj.assetType and
+                                            etf_obj.assetType.value=='CRYPTOCURRENCY' %}selected{% endif %}>Criptovalute
                                         </option>
-                                        <option value="REAL_ESTATE" {% if etf.assetType and
-                                            etf.assetType.value=='REAL_ESTATE' %}selected{% endif %}>Immobiliare
+                                        <option value="REAL_ESTATE" {% if etf_obj.assetType and
+                                            etf_obj.assetType.value=='REAL_ESTATE' %}selected{% endif %}>Immobiliare
                                         </option>
-                                        <option value="MONEY_MARKET" {% if etf.assetType and
-                                            etf.assetType.value=='MONEY_MARKET' %}selected{% endif %}>Monetario</option>
+                                        <option value="MONEY_MARKET" {% if etf_obj.assetType and
+                                            etf_obj.assetType.value=='MONEY_MARKET' %}selected{% endif %}>Monetario
+                                        </option>
                                     </select>
                                 </div>
                             </div>

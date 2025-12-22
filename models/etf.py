@@ -14,8 +14,8 @@ class EtfDAO(db.Model):
     ticker = db.Column(db.String(10), primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     isin = db.Column(db.String(15), nullable=False)
-    launchDate = db.Column(db.String(20), nullable=False)
-    currency = db.Column(db.String(10), nullable=False)
+    launchDate = db.Column(db.String(10), nullable=False)  # YYYY-MM-DD format
+    currency = db.Column(db.String(3), nullable=False)  # USD, EUR
     dividendType = db.Column(db.String(20), nullable=False)
 
     # Optional fields (can be NULL)
@@ -23,7 +23,7 @@ class EtfDAO(db.Model):
     dividendFrequency = db.Column(db.Integer)
     yeld = db.Column(db.Float)
     capital = db.Column(db.Float)
-    replication = db.Column(db.String(30))
+    replication = db.Column(db.String(30))  # Stores enum value
     volatility = db.Column(db.Float)
     indexTicker = db.Column(db.String(10), db.ForeignKey("indices.ticker"), nullable=True)
 

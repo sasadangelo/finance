@@ -4,6 +4,8 @@
 # -----------------------------------------------------------------------------
 from pydantic import BaseModel, Field, field_validator
 from dto.etf_asset_type import ETFAssetType
+from dto.etf_currency import ETFCurrency
+from dto.etf_replication_type import ETFReplicationType
 
 
 class ETF(BaseModel):
@@ -16,8 +18,8 @@ class ETF(BaseModel):
     ticker: str = Field(..., min_length=1, max_length=10, description="ETF ticker symbol")
     name: str = Field(..., min_length=1, max_length=200, description="ETF name")
     isin: str = Field(..., min_length=1, max_length=15, description="ISIN code")
-    launchDate: str = Field(..., min_length=1, max_length=20, description="Launch date")
-    currency: str = Field(..., min_length=1, max_length=10, description="Currency")
+    launchDate: str = Field(..., min_length=1, max_length=10, description="Launch date in dd/mm/yyyy format")
+    currency: ETFCurrency = Field(..., description="Currency (USD or EUR)")
     dividendType: str | None = Field(None, max_length=20, description="Dividend type (Distribuzione/Accumulazione)")
 
     # Optional fields
@@ -25,7 +27,7 @@ class ETF(BaseModel):
     dividendFrequency: int | None = Field(None, ge=1, le=12, description="Dividend frequency")
     yeld: float | None = Field(None, ge=0, le=100, description="Yield percentage")
     capital: float | None = Field(None, ge=0, description="Capital in millions")
-    replication: str | None = Field(None, max_length=100, description="Replication type")
+    replication: ETFReplicationType | None = Field(None, description="Replication type")
     volatility: float | None = Field(None, ge=0, le=100, description="Volatility percentage")
     indexTicker: str | None = Field(None, max_length=10, description="Reference index ticker")
 
