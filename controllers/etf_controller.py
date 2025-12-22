@@ -212,9 +212,10 @@ class EtfController:
             etfs = all_etfs
             self.logger.info(f"Retrieved {len(etfs)} ETFs")
 
-        # Get unique values for filter dropdowns using cached all_etfs
-        currencies: list[str] = sorted(set(etf.currency for etf in all_etfs if etf.currency))
-        replications: list[str] = sorted(set(etf.replication for etf in all_etfs if etf.replication))
+        # Get unique values for filter dropdowns
+        # For enums, show all possible values; for others, show only existing values
+        currencies: list[str] = ETFCurrency.get_all_values()
+        replications: list[str] = ETFReplicationType.get_all_values()
         dividend_types: list[str] = sorted(set(etf.dividendType for etf in all_etfs if etf.dividendType))
         index_tickers: list[str] = sorted(set(etf.indexTicker for etf in all_etfs if etf.indexTicker))
 
