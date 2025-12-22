@@ -110,10 +110,10 @@
                                             </label>
                                             <select class="form-control" id="index_ticker" name="index_ticker">
                                                 <option value="">-- Tutti --</option>
-                                                {% for idx_ticker in index_tickers %}
-                                                <option value="{{ idx_ticker }}" {% if filters.index_ticker==idx_ticker
+                                                {% for idx in indices %}
+                                                <option value="{{ idx.ticker }}" {% if filters.index_ticker==idx.ticker
                                                     %}selected{% endif %}>
-                                                    {{ idx_ticker }}
+                                                    {{ idx.name }} ({{ idx.ticker }})
                                                 </option>
                                                 {% endfor %}
                                             </select>

@@ -217,7 +217,14 @@ class EtfController:
         currencies: list[str] = ETFCurrency.get_all_values()
         replications: list[str] = ETFReplicationType.get_all_values()
         dividend_types: list[str] = sorted(set(etf.dividendType for etf in all_etfs if etf.dividendType))
-        index_tickers: list[str] = sorted(set(etf.indexTicker for etf in all_etfs if etf.indexTicker))
+
+        # Get unique index tickers and fetch their full Index objects
+        unique_index_tickers: set[str] = set(etf.indexTicker for etf in all_etfs if etf.indexTicker)
+        indices: list[Index] = []
+        for ticker in sorted(unique_index_tickers):
+            index = self.index_service.get_by_ticker(ticker)
+            if index:
+                indices.append(index)
 
         return render_template(
             template_name_or_list="etf/index.html",
@@ -227,7 +234,7 @@ class EtfController:
             currencies=currencies,
             replications=replications,
             dividend_types=dividend_types,
-            index_tickers=index_tickers,
+            indices=indices,
             has_filters=has_filters,
         )
 
